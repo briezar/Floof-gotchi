@@ -15,11 +15,13 @@ public class InputManager : SingletonMonoBehaviour<InputManager>
 
     private void Update()
     {
+        if (!UIManager.IsInteractable) { return; }
         foreach (var keybind in Keybinds)
         {
             if (Input.GetKeyDown(keybind.Key))
             {
                 keybind.Value?.Invoke();
+                break;
             }
         }
     }
@@ -42,6 +44,10 @@ public class InputManager : SingletonMonoBehaviour<InputManager>
             if (multipleAction)
             {
                 Keybinds[key] += action;
+            }
+            else
+            {
+                Keybinds[key] = action;
             }
         }
         else

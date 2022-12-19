@@ -53,7 +53,17 @@ public class AssetManager
     public static void InstantiateAsync<T>(string path, Transform parent = null, Action<T> onComplete = null) where T : Component
     {
         var handle = Addressables.InstantiateAsync(path, parent);
-        handle.Completed += (opHandle) => { onComplete?.Invoke(opHandle.Result.GetComponent<T>()); };
+        handle.Completed += (opHandle) =>
+        {
+            try
+            {
+            onComplete?.Invoke(opHandle.Result.GetComponent<T>());
+            }
+            catch (NullReferenceException)
+            {
+                Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
+            }
+        };
     }
 
 }

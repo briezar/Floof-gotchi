@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using DG.Tweening;
 
 public enum UILayer
 {
@@ -13,17 +12,17 @@ public enum UILayer
 }
 public class UIManager : SingletonMonoBehaviour<UIManager>
 {
-    [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference _uiLabelRef;
+    // [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference _uiLabelRef;
     [SerializeField] private Camera _uiCamera;
+    [SerializeField] private EventSystem _eventSystem;
     [SerializeField] private Transform _mainCanvasGameRect;
-
 
     public Dictionary<UILayer, Transform> UILayers { get; private set; } = new();
     public BaseUI TopUI { get; private set; }
     public Camera UICamera => _uiCamera;
+    public static bool IsInteractable => Instance._blockCount <= 0;
 
     private List<BaseUI> _currentUIs = new();
-    private EventSystem _eventSystem = EventSystem.current;
     private Dictionary<string, BaseUI> _preloadedUIs = new();
 
     private int _blockCount = 0;
@@ -70,7 +69,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         Instance.ShowUI<T>(UILayer.Main, onComplete, true);
     }
 
-    public static void ShowPopup<T>(Action<T> onComplete = null, bool singleInstance = true) where T : BaseUI
+    public static void ShowPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
     {
         Instance.ShowUI<T>(UILayer.Popup, onComplete, singleInstance);
     }
@@ -98,7 +97,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
         void OnComplete(T targetUI)
         {
-            ShowUI(targetUI);
+            ShowUI(targetUI).SetLayer(uiLayer);
 
             if (singleInstance)
             {
@@ -107,7 +106,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             else
             {
                 _currentUIs.Add(targetUI);
-            } 
+            }
 
             onComplete?.Invoke(targetUI);
         }
@@ -117,6 +116,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     {
         ui.transform.SetAsLastSibling();
         ui.gameObject.SetActive(true);
+
+        ui.OnShow();
 
         TopUI = ui;
 
@@ -129,12 +130,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
     public static void HideLowerUIs()
     {
-        foreach (var ui in Instance._currentUIs)
+        var lowerUIs = Instance._currentUIs.FindAll((ui) => ui != Instance.TopUI);
+
+        foreach (var ui in lowerUIs)
         {
-            if (ui != Instance.TopUI)
-            {
-                ui.gameObject.SetActive(false);
-            }
+            HideUI(ui);
         }
     }
 
@@ -147,12 +147,17 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     }
     public static void HideUI(BaseUI ui)
     {
-        ui.gameObject.SetActive(false);
+        ui.OnHide();
+        ui.gameObject?.SetActive(false);
     }
 
     public static void ShowNextUI()
     {
-
+        var index = Instance._currentUIs.IndexOf(Instance.TopUI);
+        if (index > 0)
+        {
+            Instance.ShowUI(Instance._currentUIs[index - 1]);
+        }
     }
 
     public static void ReleaseUI<T>() where T : BaseUI
