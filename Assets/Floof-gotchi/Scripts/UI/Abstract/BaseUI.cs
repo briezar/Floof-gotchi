@@ -6,7 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public abstract class BaseUI : MonoBehaviour
 {
-    protected RectTransform rectTransform { get; private set; }
+    public RectTransform rectTransform { get; private set; }
+    public CanvasGroup canvasGroup { get; private set; }
 
     public UILayer Layer { get; private set; }
     public bool IsActive => gameObject.activeInHierarchy;
@@ -14,6 +15,7 @@ public abstract class BaseUI : MonoBehaviour
     private void Awake()
     {
         rectTransform = (RectTransform)transform;
+        canvasGroup = this.ForceGetComponent<CanvasGroup>();
         OnInit();
     }
 

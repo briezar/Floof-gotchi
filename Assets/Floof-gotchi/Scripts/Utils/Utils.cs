@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class Utils
 {
-    public static void WaitThenDo(float delay, Action action)
+    public static void WaitAndDo(float delay, Action action)
     {
         StartCoroutine(WaitThenDoRoutine());
         IEnumerator WaitThenDoRoutine()
@@ -26,6 +26,16 @@ public static class Utils
     public static void StopCoroutine(Coroutine routine)
     {
         if (routine != null) { GameManager.Instance.StopCoroutine(routine); }
+    }
+
+    public static T ForceGetComponent<T>(this UnityEngine.Object obj) where T : Component
+    {
+        var component = (Component)obj;
+        if (!component.TryGetComponent<T>(out var result))
+        {
+            result = component.gameObject.AddComponent<T>();
+        }
+        return result;
     }
 
     public static void DestroyGameObject(this Component component)

@@ -42,8 +42,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
         // AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelRef, (value) => { _preloadedUIs = value; });
 
-        InputManager.SubscribeInput(KeyCode.Q, () => { ShowUI<PlayUI>(); });
-        InputManager.SubscribeInput(KeyCode.W, () => { ShowUI<LoadUI>(); });
+        InputManager.SubscribeInput(KeyCode.Q, () => { AsyncShowUI<PlayUI>(); });
+        InputManager.SubscribeInput(KeyCode.W, () => { AsyncShowUI<LoadUI>(); });
 
         InputManager.SubscribeInput(KeyCode.A, () => { HideUI<PlayUI>(); });
         InputManager.SubscribeInput(KeyCode.S, () => { HideUI<LoadUI>(); });
@@ -65,22 +65,22 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public static void PreloadUI<T>(Action<T> onComplete = null) where T : BaseUI
     {
         onComplete += (ui) => { ui.gameObject.SetActive(false); };
-        ShowUI<T>(onComplete, false);
+        AsyncShowUI<T>(onComplete, false);
 
         // AssetManager.LoadAsync<T>(GetAddressUI<T>(), onComplete);
     }
 
-    public static void ShowUI<T>(Action<T> onComplete = null, bool hideLowerUI = true) where T : BaseUI
+    public static void AsyncShowUI<T>(Action<T> onComplete = null, bool hideLowerUI = true) where T : BaseUI
     {
-        Instance.ShowUI<T>(UILayer.Main, onComplete, hideLowerUI, true);
+        Instance.AsyncShow<T>(UILayer.Main, onComplete, hideLowerUI, true);
     }
 
-    public static void ShowPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
+    public static void AsyncShowPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
     {
-        Instance.ShowUI<T>(UILayer.Popup, onComplete, false, singleInstance);
+        Instance.AsyncShow<T>(UILayer.Popup, onComplete, false, singleInstance);
     }
 
-    public void ShowUI<T>(UILayer uiLayer, Action<T> onComplete, bool hideLowerUI, bool singleInstance = true) where T : BaseUI
+    public void AsyncShow<T>(UILayer uiLayer, Action<T> onComplete, bool hideLowerUI, bool singleInstance = true) where T : BaseUI
     {
         T ui = null;
         bool instantiate = !singleInstance;
@@ -120,7 +120,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
                 _currentUIs.Add(targetUI);
             }
 
-            ShowUI(targetUI).SetLayer(uiLayer);
+            Show(targetUI).SetLayer(uiLayer);
 
             if (hideLowerUI)
             {
@@ -131,10 +131,16 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-    public BaseUI ShowUI(BaseUI ui)
+    /// <summary>
+    /// Only use when UI is preloaded!
+    /// </summary>
+    public static T ShowUI<T>() where T : BaseUI
     {
-        if (!_currentUIs.Contains(ui)) { Debug.LogError($"CurrentUI does not contain {ui.name}!"); }
+        return Instance.Show(GetUI<T>());
+    }
 
+    private T Show<T>(T ui) where T : BaseUI
+    {
         ui.transform.SetAsLastSibling();
         ui.gameObject.SetActive(true);
 
@@ -168,7 +174,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         ui.gameObject.SetActive(false);
     }
 
-    public void ShowNextUI()
+    public void ShowNextUI(bool hideTopUI = true)
     {
         if (_currentUIs.Count <= 1) { return; }
 
@@ -177,8 +183,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         _currentUIs.Remove(lastTopUI);
         _currentUIs.Insert(0, lastTopUI);
 
-        HideUI(lastTopUI);
-        ShowUI(TopUI);
+        if (hideTopUI)
+        {
+            HideUI(lastTopUI);
+        }
+        Show(TopUI);
     }
 
     public static void ReleaseUI<T>() where T : BaseUI
@@ -194,7 +203,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         ui.DestroyGameObject();
     }
 
-    private static T GetUI<T>() where T : BaseUI
+    public static T GetUI<T>() where T : BaseUI
     {
         T capturedUI = null;
         foreach (var ui in Instance._currentUIs)
@@ -231,6 +240,4 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         Instance._blockCount++;
 
     }
-
-
 }

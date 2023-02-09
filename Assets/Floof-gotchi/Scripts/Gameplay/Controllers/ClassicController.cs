@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class ClassicController
@@ -8,7 +9,7 @@ public class ClassicController
     private PlayUI _gameView;
     public ClassicController()
     {
-        UIManager.ShowUI<PlayUI>((playUI) => _gameView = playUI);
+        _gameView = UIManager.ShowUI<PlayUI>();
     }
 
 }

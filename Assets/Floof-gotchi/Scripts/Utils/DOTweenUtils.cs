@@ -7,13 +7,13 @@ using System;
 public static class DOTweenUtils
 {
     /// <summary> Run the Action<float> from startFloat to endFloat </summary>
-    public static Tween DORunFloat(Action<float> actionFloat, float startFloat, float endFloat, float time, Ease ease = Ease.OutQuad)
+    public static Tween DORunFloat(Action<float> actionFloat, float startFloat, float endFloat, float time)
     {
-        return DOTween.To(() => startFloat, (x) => actionFloat(x), endFloat, time).SetEase(ease);
+        return DOTween.To(() => startFloat, (value) => actionFloat(value), endFloat, time);
     }
-    public static Tween DORunInt(Action<int> actionInt, int startInt, int endInt, float time, Ease ease = Ease.OutQuad)
+    public static Tween DORunInt(Action<int> actionInt, int startInt, int endInt, float time)
     {
-        return DOTween.To(() => startInt, (x) => actionInt(x), endInt, time).SetEase(ease);
+        return DOTween.To(() => startInt, (value) => actionInt(value), endInt, time);
     }
 
     /// <summary> Try killing the tween </summary>

@@ -1,20 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
+using UnityEngine.UI;
 
 public class AutoScroll : MonoBehaviour
 {
-    [SerializeField] private RectTransform _boundParent;
-    [SerializeField] private RectTransform _target;
-    [SerializeField] private float _widthHeightRatio;
-    [SerializeField] private float _duration = 10f;
+    [SerializeField] private RawImage _image;
+    [SerializeField] Vector2 _direction;
 
-    private void Start()
+    private void Update()
     {
-        _target.anchoredPosition = Vector3.zero;
-        var minLocalPosX = -(_boundParent.rect.height * _widthHeightRatio - _boundParent.rect.width - 1f);
-        _target.DOAnchorPosX(minLocalPosX, _duration).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        _image.uvRect = new Rect(_image.uvRect.position + _direction * Time.deltaTime, _image.uvRect.size);
     }
 
 }

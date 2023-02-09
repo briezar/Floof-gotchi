@@ -7,11 +7,11 @@ public enum Needs { Wellness, Hungry, Hygiene, Sleep }
 
 public class PlayUI : BaseUI
 {
-    [SerializeField] Transform _bottomBar;
+    [SerializeField] private Transform _bottomBar;
 
     public Dictionary<Needs, NeedsIcon> NeedsIcons { get; private set; } = new();
 
-    private void Awake()
+    public override void OnInit()
     {
         var allNeeds = _bottomBar.GetComponentsInChildren<NeedsIcon>();
         for (int i = 0; i < allNeeds.Length; i++)
@@ -22,7 +22,7 @@ public class PlayUI : BaseUI
 
     public override void OnBack()
     {
-        UIManager.ShowPopup<LeavePopup>();
+        UIManager.AsyncShowPopup<LeavePopup>();
     }
 
 }
