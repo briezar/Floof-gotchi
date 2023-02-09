@@ -7,7 +7,7 @@ public static class Utils
 {
     public static void WaitThenDo(float delay, Action action)
     {
-        GameManager.Instance.StartCoroutine(WaitThenDoRoutine());
+        StartCoroutine(WaitThenDoRoutine());
         IEnumerator WaitThenDoRoutine()
         {
             yield return new WaitForSeconds(delay);

@@ -256,7 +256,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1711006236236774600}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7547872495734998908}
+        m_TargetAssemblyTypeName: LeavePopup, Assembly-CSharp
+        m_MethodName: Click_Deny
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2560317351570439322
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,4 +829,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5424833743532025613}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7547872495734998908}
+        m_TargetAssemblyTypeName: LeavePopup, Assembly-CSharp
+        m_MethodName: Click_Confirm
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

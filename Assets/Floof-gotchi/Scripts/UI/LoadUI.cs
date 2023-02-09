@@ -4,8 +4,5 @@ using UnityEngine;
 
 public class LoadUI : BaseUI
 {
-    public override void OnBack()
-    {
-        UIManager.HideUI(this);
-    }
+
 }

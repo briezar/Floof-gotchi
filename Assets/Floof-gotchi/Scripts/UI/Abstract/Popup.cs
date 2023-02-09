@@ -6,7 +6,16 @@ public class Popup : BaseUI
 {
     public override void OnHide()
     {
-        Debug.Log("on hide");
         UIManager.ReleaseUI(this);
+    }
+
+    public virtual void Click_Confirm()
+    {
+
+    }
+
+    public virtual void Click_Deny()
+    {
+
     }
 }

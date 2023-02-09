@@ -12,4 +12,14 @@ public class LeavePopup : Popup
         Application.Quit();
     }
 
+    public override void Click_Confirm()
+    {
+        OnBack();
+    }
+
+    public override void Click_Deny()
+    {
+        OnHide();
+    }
+
 }

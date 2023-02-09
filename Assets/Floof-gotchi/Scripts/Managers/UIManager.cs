@@ -18,7 +18,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     [SerializeField] private Transform _mainCanvasGameRect;
 
     public Dictionary<UILayer, Transform> UILayers { get; private set; } = new();
-    public BaseUI TopUI { get; private set; }
+    public BaseUI TopUI => _currentUIs.GetLast();
     public Camera UICamera => _uiCamera;
     public static bool IsInteractable => Instance._blockCount <= 0;
 
@@ -42,16 +42,19 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
         // AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelRef, (value) => { _preloadedUIs = value; });
 
-        // StartCoroutine(PreloadUI());
+        InputManager.SubscribeInput(KeyCode.Q, () => { ShowUI<PlayUI>(); });
+        InputManager.SubscribeInput(KeyCode.W, () => { ShowUI<LoadUI>(); });
 
-        InputManager.SubscribeInput(KeyCode.Q, () => { ShowUI<MainMenuUI>((ui) => { HideLowerUIs(); }); });
-        InputManager.SubscribeInput(KeyCode.W, () => { ShowUI<LoadUI>((ui) => { HideLowerUIs(); }); });
-
-        InputManager.SubscribeInput(KeyCode.A, () => { HideUI<MainMenuUI>(); });
+        InputManager.SubscribeInput(KeyCode.A, () => { HideUI<PlayUI>(); });
         InputManager.SubscribeInput(KeyCode.S, () => { HideUI<LoadUI>(); });
 
-        InputManager.SubscribeInput(KeyCode.Z, () => { ReleaseUI<MainMenuUI>(); });
+        InputManager.SubscribeInput(KeyCode.Z, () => { ReleaseUI<PlayUI>(); });
         InputManager.SubscribeInput(KeyCode.X, () => { ReleaseUI<LoadUI>(); });
+
+        InputManager.SubscribeInput(KeyCode.Escape, () =>
+        {
+            if (TopUI != null) { TopUI.OnBack(); }
+        });
 
     }
 
@@ -59,22 +62,25 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
     private static string GetAddressUI<T>() => "UI/" + typeof(T).Name + ".prefab";
 
-    public static void PreloadUI<T>(Action<T> onComplete) where T : BaseUI
+    public static void PreloadUI<T>(Action<T> onComplete = null) where T : BaseUI
     {
-        AssetManager.LoadAsync<T>(GetAddressUI<T>(), onComplete);
+        onComplete += (ui) => { ui.gameObject.SetActive(false); };
+        ShowUI<T>(onComplete, false);
+
+        // AssetManager.LoadAsync<T>(GetAddressUI<T>(), onComplete);
     }
 
-    public static void ShowUI<T>(Action<T> onComplete = null) where T : BaseUI
+    public static void ShowUI<T>(Action<T> onComplete = null, bool hideLowerUI = true) where T : BaseUI
     {
-        Instance.ShowUI<T>(UILayer.Main, onComplete, true);
+        Instance.ShowUI<T>(UILayer.Main, onComplete, hideLowerUI, true);
     }
 
     public static void ShowPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
     {
-        Instance.ShowUI<T>(UILayer.Popup, onComplete, singleInstance);
+        Instance.ShowUI<T>(UILayer.Popup, onComplete, false, singleInstance);
     }
 
-    public void ShowUI<T>(UILayer uiLayer, Action<T> onComplete, bool singleInstance = true) where T : BaseUI
+    public void ShowUI<T>(UILayer uiLayer, Action<T> onComplete, bool hideLowerUI, bool singleInstance = true) where T : BaseUI
     {
         T ui = null;
         bool instantiate = !singleInstance;
@@ -97,15 +103,28 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
         void OnComplete(T targetUI)
         {
-            ShowUI(targetUI).SetLayer(uiLayer);
-
             if (singleInstance)
             {
-                if (!_currentUIs.Contains(targetUI)) { _currentUIs.Add(targetUI); }
+                if (_currentUIs.Contains(targetUI))
+                {
+                    _currentUIs.Remove(targetUI);
+                    _currentUIs.Add(targetUI);
+                }
+                else
+                {
+                    _currentUIs.Add(targetUI);
+                }
             }
             else
             {
                 _currentUIs.Add(targetUI);
+            }
+
+            ShowUI(targetUI).SetLayer(uiLayer);
+
+            if (hideLowerUI)
+            {
+                HideLowerUI();
             }
 
             onComplete?.Invoke(targetUI);
@@ -114,28 +133,24 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
     public BaseUI ShowUI(BaseUI ui)
     {
+        if (!_currentUIs.Contains(ui)) { Debug.LogError($"CurrentUI does not contain {ui.name}!"); }
+
         ui.transform.SetAsLastSibling();
         ui.gameObject.SetActive(true);
 
         ui.OnShow();
 
-        TopUI = ui;
-
-        InputManager.SubscribeInput(KeyCode.Escape, TopUI.OnBack);
-
         return ui;
     }
 
-
-
-    public static void HideLowerUIs()
+    public static void HideLowerUI()
     {
-        var lowerUIs = Instance._currentUIs.FindAll((ui) => ui != Instance.TopUI);
+        var count = Instance._currentUIs.Count;
+        if (count <= 1) { return; }
 
-        foreach (var ui in lowerUIs)
-        {
-            HideUI(ui);
-        }
+        var index = count - 2;
+        var ui = Instance._currentUIs[index];
+        HideUI(ui);
     }
 
     public static void HideUI<T>() where T : BaseUI
@@ -147,17 +162,23 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     }
     public static void HideUI(BaseUI ui)
     {
+        if (!ui.gameObject.activeInHierarchy) { return; }
+
         ui.OnHide();
-        ui.gameObject?.SetActive(false);
+        ui.gameObject.SetActive(false);
     }
 
-    public static void ShowNextUI()
+    public void ShowNextUI()
     {
-        var index = Instance._currentUIs.IndexOf(Instance.TopUI);
-        if (index > 0)
-        {
-            Instance.ShowUI(Instance._currentUIs[index - 1]);
-        }
+        if (_currentUIs.Count <= 1) { return; }
+
+        var lastTopUI = TopUI;
+
+        _currentUIs.Remove(lastTopUI);
+        _currentUIs.Insert(0, lastTopUI);
+
+        HideUI(lastTopUI);
+        ShowUI(TopUI);
     }
 
     public static void ReleaseUI<T>() where T : BaseUI

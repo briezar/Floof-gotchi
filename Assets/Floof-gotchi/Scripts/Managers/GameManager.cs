@@ -12,6 +12,14 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         DontDestroyOnLoad(UIManager.Instance.gameObject);
 
         Application.targetFrameRate = 60;
+
+        UIManager.PreloadUI<PlayUI>();
+
+        UIManager.SetInteractable(false);
+        UIManager.ShowUI<LoadUI>((ui) =>
+        {
+            UIManager.SetInteractable(true);
+        });
     }
 
 }
