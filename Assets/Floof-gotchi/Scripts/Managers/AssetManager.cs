@@ -8,40 +8,50 @@ using System;
 
 public class AssetManager
 {
-    public static void PreloadAssetLabelRef<T>(AssetLabelReference assetLabelRef, Action<Dictionary<string, T>> onLoaded) where T : Component
+    public static Coroutine PreloadAssetLabelRef<T>(AssetLabelReference[] assetLabelRefs, Action<Dictionary<string, T>> onLoaded, Action<float> actionPercentComplete = null) where T : Component
     {
-        Utils.StartCoroutine(PreloadAssetLabelRefRoutine<T>(assetLabelRef, onLoaded));
-    }
-    private static IEnumerator PreloadAssetLabelRefRoutine<T>(AssetLabelReference assetLabelRef, Action<Dictionary<string, T>> onLoaded) where T : Component
-    {
-        var preloadedAssets = new Dictionary<string, T>();
-        var loadResourceLocationsHandle = Addressables.LoadResourceLocationsAsync(assetLabelRef, typeof(GameObject));
-
-        if (!loadResourceLocationsHandle.IsDone) { yield return loadResourceLocationsHandle; }
-
-        //start each location loading
-        var operationList = new List<AsyncOperationHandle>();
-
-        foreach (var location in loadResourceLocationsHandle.Result)
+        var labels = new HashSet<string>();
+        foreach (var labelRef in assetLabelRefs)
         {
-            var loadAssetHandle = Addressables.LoadAssetAsync<GameObject>(location);
-            loadAssetHandle.Completed += (obj) => { preloadedAssets.Add(obj.Result.name, obj.Result.GetComponent<T>()); };
-            operationList.Add(loadAssetHandle);
+            labels.Add(labelRef.labelString);
         }
-
-        //create a GroupOperation to wait on all the above loads at once. 
-        var groupOp = Addressables.ResourceManager.CreateGenericGroupOperation(operationList);
-
-        if (!groupOp.IsDone) { yield return groupOp; }
-
-        Addressables.Release(loadResourceLocationsHandle);
-
-        foreach (var item in preloadedAssets)
+        return Utils.StartCoroutine(PreloadAssetLabelRefRoutine());
+        IEnumerator PreloadAssetLabelRefRoutine()
         {
-            Debug.Log(item.Key + " - " + item.Value.name);
-        }
+            var preloadedAssets = new Dictionary<string, T>();
+            var loadResourceLocationsHandle = Addressables.LoadResourceLocationsAsync(labels, Addressables.MergeMode.Intersection, typeof(GameObject));
 
-        onLoaded?.Invoke(preloadedAssets);
+            if (!loadResourceLocationsHandle.IsDone) { yield return loadResourceLocationsHandle; }
+
+            //start each location loading
+            var operationList = new List<AsyncOperationHandle>();
+
+            foreach (var location in loadResourceLocationsHandle.Result)
+            {
+                var loadAssetHandle = Addressables.LoadAssetAsync<GameObject>(location);
+                loadAssetHandle.Completed += (obj) => { preloadedAssets.Add(obj.Result.name, obj.Result.GetComponent<T>()); };
+                operationList.Add(loadAssetHandle);
+            }
+
+            //create a GroupOperation to wait on all the above loads at once. 
+            var groupOp = Addressables.ResourceManager.CreateGenericGroupOperation(operationList);
+
+            while (!groupOp.IsDone)
+            {
+                actionPercentComplete?.Invoke(groupOp.PercentComplete);
+                yield return null;
+            }
+            actionPercentComplete?.Invoke(1f);
+
+            Addressables.Release(loadResourceLocationsHandle);
+
+            // foreach (var item in preloadedAssets)
+            // {
+            //     Debug.Log(item.Key + " - " + item.Value.name);
+            // }
+
+            onLoaded?.Invoke(preloadedAssets);
+        }
     }
 
     public static void LoadAsync<T>(string path, Action<T> onComplete = null) where T : Component
@@ -57,7 +67,7 @@ public class AssetManager
         {
             try
             {
-            onComplete?.Invoke(opHandle.Result.GetComponent<T>());
+                onComplete?.Invoke(opHandle.Result.GetComponent<T>());
             }
             catch (NullReferenceException)
             {

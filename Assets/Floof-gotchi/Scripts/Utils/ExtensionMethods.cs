@@ -66,4 +66,29 @@ public static class ExtensionMethods
 
     #endregion
 
+
+    #region GameObject
+    public static void DestroyGameObject(this Component component, bool releaseMemory = false)
+    {
+        if (releaseMemory)
+        {
+            UnityEngine.AddressableAssets.Addressables.ReleaseInstance(component.gameObject);
+        }
+        else
+        {
+            GameObject.Destroy(component.gameObject);
+        }
+    }
+
+    #endregion
+
+
+    public static T ForceGetComponent<T>(this Component component) where T : Component
+    {
+        if (!component.TryGetComponent<T>(out var result))
+        {
+            result = component.gameObject.AddComponent<T>();
+        }
+        return result;
+    }
 }

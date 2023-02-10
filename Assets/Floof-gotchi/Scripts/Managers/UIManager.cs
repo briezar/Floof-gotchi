@@ -12,7 +12,7 @@ public enum UILayer
 }
 public class UIManager : SingletonMonoBehaviour<UIManager>
 {
-    // [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference _uiLabelRef;
+    [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference[] _uiLabelPreload;
     [SerializeField] private Camera _uiCamera;
     [SerializeField] private EventSystem _eventSystem;
     [SerializeField] private Transform _mainCanvasGameRect;
@@ -40,54 +40,68 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
         sampleLayer.DestroyGameObject();
 
-        // AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelRef, (value) => { _preloadedUIs = value; });
-
-        InputManager.SubscribeInput(KeyCode.Q, () => { AsyncShowUI<PlayUI>(); });
-        InputManager.SubscribeInput(KeyCode.W, () => { AsyncShowUI<LoadUI>(); });
-
-        InputManager.SubscribeInput(KeyCode.A, () => { HideUI<PlayUI>(); });
-        InputManager.SubscribeInput(KeyCode.S, () => { HideUI<LoadUI>(); });
-
-        InputManager.SubscribeInput(KeyCode.Z, () => { ReleaseUI<PlayUI>(); });
-        InputManager.SubscribeInput(KeyCode.X, () => { ReleaseUI<LoadUI>(); });
-
-        InputManager.SubscribeInput(KeyCode.Escape, () =>
-        {
-            if (TopUI != null) { TopUI.OnBack(); }
-        });
-
     }
 
-    //     AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelRef, (Dictionary<string, BaseUI> value) => { _preloadedUIs = value; });
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q)) { ShowUI<PlayUI>(); }
+        if (Input.GetKeyDown(KeyCode.W)) { ShowUI<LoadUI>(); }
+
+        if (Input.GetKeyDown(KeyCode.A)) { HideUI<PlayUI>(); }
+        if (Input.GetKeyDown(KeyCode.S)) { HideUI<LoadUI>(); }
+
+        if (Input.GetKeyDown(KeyCode.Z)) { ReleaseUI<PlayUI>(true); }
+        if (Input.GetKeyDown(KeyCode.X)) { ReleaseUI<LoadUI>(true); }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (TopUI != null)
+            {
+                TopUI.OnBack();
+            }
+        }
+    }
+
+    public Coroutine PreloadUIsRoutine(Action<float> actionPercentComplete)
+    {
+        return AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelPreload, (value) => { _preloadedUIs = value; }, actionPercentComplete);
+    }
 
     private static string GetAddressUI<T>() => "UI/" + typeof(T).Name + ".prefab";
 
-    public static void PreloadUI<T>(Action<T> onComplete = null) where T : BaseUI
+    private static T GetPreloadedUI<T>() where T : BaseUI
     {
-        onComplete += (ui) => { ui.gameObject.SetActive(false); };
-        AsyncShowUI<T>(onComplete, false);
-
-        // AssetManager.LoadAsync<T>(GetAddressUI<T>(), onComplete);
+        if (Instance._preloadedUIs.TryGetValue(typeof(T).Name, out var ui))
+        {
+            return (T)ui;
+        }
+        return null;
     }
 
-    public static void AsyncShowUI<T>(Action<T> onComplete = null, bool hideLowerUI = true) where T : BaseUI
+    private static T GetInstantiatedUI<T>() where T : BaseUI
     {
-        Instance.AsyncShow<T>(UILayer.Main, onComplete, hideLowerUI, true);
+        var ui = (T)Instance._currentUIs.Find((ui) => ui.GetType() == typeof(T));
+        return ui;
     }
 
-    public static void AsyncShowPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
+    public static void ShowAsyncUI<T>(Action<T> onComplete = null) where T : BaseUI
     {
-        Instance.AsyncShow<T>(UILayer.Popup, onComplete, false, singleInstance);
+        Instance.ShowAsync<T>(UILayer.Main, onComplete, true);
     }
 
-    public void AsyncShow<T>(UILayer uiLayer, Action<T> onComplete, bool hideLowerUI, bool singleInstance = true) where T : BaseUI
+    public static void ShowAsyncPopup<T>(Action<T> onComplete = null, bool singleInstance = false) where T : BaseUI
+    {
+        Instance.ShowAsync<T>(UILayer.Popup, onComplete, singleInstance);
+    }
+
+    public void ShowAsync<T>(UILayer uiLayer, Action<T> onComplete, bool singleInstance = true) where T : BaseUI
     {
         T ui = null;
         bool instantiate = !singleInstance;
 
         if (singleInstance)
         {
-            ui = GetUI<T>();
+            ui = GetPreloadedUI<T>();
             if (ui == null) { instantiate = true; }
         }
 
@@ -122,11 +136,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
             Show(targetUI).SetLayer(uiLayer);
 
-            if (hideLowerUI)
-            {
-                HideLowerUI();
-            }
-
             onComplete?.Invoke(targetUI);
         }
     }
@@ -134,13 +143,31 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     /// <summary>
     /// Only use when UI is preloaded!
     /// </summary>
-    public static T ShowUI<T>() where T : BaseUI
+    public static T ShowUI<T>(UILayer uILayer = UILayer.Main) where T : BaseUI
     {
-        return Instance.Show(GetUI<T>());
+        var name = typeof(T).Name;
+        var ui = GetInstantiatedUI<T>();
+
+        if (ui == null)
+        {
+            ui = GetPreloadedUI<T>();
+            if (ui == null)
+            {
+                Debug.LogError(name + " is not preloaded!"); return null;
+            }
+            ui = GameObject.Instantiate<T>(ui, Instance.UILayers[uILayer]);
+            Instance._currentUIs.Add(ui);
+
+        }
+
+        return Instance.Show(ui);
     }
 
     private T Show<T>(T ui) where T : BaseUI
     {
+        _currentUIs.Remove(ui);
+        _currentUIs.Add(ui);
+
         ui.transform.SetAsLastSibling();
         ui.gameObject.SetActive(true);
 
@@ -161,7 +188,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 
     public static void HideUI<T>() where T : BaseUI
     {
-        var ui = GetUI<T>();
+        var ui = GetInstantiatedUI<T>();
         if (ui == null) { return; }
 
         HideUI(ui);
@@ -190,31 +217,31 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         Show(TopUI);
     }
 
-    public static void ReleaseUI<T>() where T : BaseUI
+    public static void ReleaseUI<T>(bool releaseMemory = false) where T : BaseUI
     {
-        var ui = GetUI<T>();
-        if (ui == null) { return; }
-
-        ReleaseUI(ui);
-    }
-    public static void ReleaseUI(BaseUI ui)
-    {
-        Instance._currentUIs.Remove(ui);
-        ui.DestroyGameObject();
-    }
-
-    public static T GetUI<T>() where T : BaseUI
-    {
-        T capturedUI = null;
-        foreach (var ui in Instance._currentUIs)
+        var ui = GetInstantiatedUI<T>();
+        if (releaseMemory)
         {
-            if (ui as T != null)
+            if (ui == null)
             {
-                capturedUI = (T)ui;
-                break;
+                ui = GetPreloadedUI<T>();
+            }
+            else
+            {
+                releaseMemory = false;
             }
         }
-        return capturedUI;
+        else
+        {
+            if (ui == null) { return; }
+        }
+
+        ReleaseUI(ui, releaseMemory);
+    }
+    public static void ReleaseUI(BaseUI ui, bool releaseMemory = false)
+    {
+        Instance._currentUIs.Remove(ui);
+        ui.DestroyGameObject(releaseMemory);
     }
 
     public static void SetInteractable(bool interactable, bool force = false)

@@ -22,7 +22,7 @@ public class PlayUI : BaseUI
 
     public override void OnBack()
     {
-        UIManager.AsyncShowPopup<LeavePopup>();
+        UIManager.ShowAsyncPopup<LeavePopup>();
     }
 
 }

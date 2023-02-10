@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Utils
+public class Utils
 {
     public static void WaitAndDo(float delay, Action action)
     {
@@ -28,23 +28,6 @@ public static class Utils
         if (routine != null) { GameManager.Instance.StopCoroutine(routine); }
     }
 
-    public static T ForceGetComponent<T>(this UnityEngine.Object obj) where T : Component
-    {
-        var component = (Component)obj;
-        if (!component.TryGetComponent<T>(out var result))
-        {
-            result = component.gameObject.AddComponent<T>();
-        }
-        return result;
-    }
-
-    public static void DestroyGameObject(this Component component)
-    {
-        if (!UnityEngine.AddressableAssets.Addressables.ReleaseInstance(component.gameObject))
-        {
-            GameObject.Destroy(component.gameObject);
-        }
-    }
 }
 
 

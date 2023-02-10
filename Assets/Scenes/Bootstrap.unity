@@ -634,6 +634,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef330222459bc87428c2ab7b15e6ae13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _uiLabelPreload:
+  - m_LabelString: UI
   _uiCamera: {fileID: 519420031}
   _eventSystem: {fileID: 226494413}
   _mainCanvasGameRect: {fileID: 1163183630}

@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: UI Local
+  m_Name: UI Remote
   m_EditorClassIdentifier: 
-  m_GroupName: UI Local
+  m_GroupName: UI Remote
   m_Data:
     m_SerializedData: []
-  m_GUID: 647edb615ec0acc42811cca919629c16
+  m_GUID: f972725319dbb944fb0fb7ee65960957
   m_SerializeEntries:
-  - m_GUID: 52fb9ea77d855ab4fb51e9021422868a
-    m_Address: UI
+  - m_GUID: ba14ce327a04f4a4e91817e4b06afe3d
+    m_Address: UI/PlayUI.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
-  - m_GUID: e30bb985e51d8d7409004d9a805374eb
-    m_Address: Assets/Floof-gotchi/Prefabs/UI_DynamicLoad
+  - m_GUID: cc72fab626dd2bd4abaf0be58887077f
+    m_Address: UI/LeavePopup.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
@@ -31,5 +31,5 @@ MonoBehaviour:
   m_Settings: {fileID: 11400000, guid: 54391f2a50e1dc043b87717b63195d43, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 7cefc33c3ab908b4582f669c36d12b84, type: 2}
-    - {fileID: 11400000, guid: e6bf7c494d772cf479215f1ddff4d43c, type: 2}
+    - {fileID: 11400000, guid: b57334d32f4bd504b8d1063b02454c84, type: 2}
+    - {fileID: 11400000, guid: 215811430d5d5aa4f947f35e682f4b62, type: 2}

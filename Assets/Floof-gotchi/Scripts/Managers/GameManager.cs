@@ -9,7 +9,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private void Awake()
     {
         DontDestroyOnLoad(Instance.gameObject);
-        DontDestroyOnLoad(InputManager.Instance.gameObject);
         DontDestroyOnLoad(AudioManager.Instance.gameObject);
         DontDestroyOnLoad(UIManager.Instance.gameObject);
 
@@ -20,25 +19,29 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     private void Init()
     {
-        UIManager.PreloadUI<PlayUI>();
-        UIManager.SetInteractable(false);
-        UIManager.Instance.AsyncShow<LoadUI>(UILayer.Overlay, (ui) =>
+        StartCoroutine(InitRoutine());
+        IEnumerator InitRoutine()
         {
-            ui.Fill = 0f;
-            var sequence = DOTween.Sequence();
-            sequence.AppendInterval(0.5f);
-            sequence.Append(DOTweenUtils.DORunFloat((fill) => ui.Fill = fill, 0f, 1f, 1f).SetEase(Ease.InOutSine));
-            sequence.AppendInterval(0.5f);
-            sequence.AppendCallback(() => new ClassicController());
-            sequence.Append(ui.canvasGroup.DOFade(0f, 1f));
-            sequence.AppendCallback(OnFinishLoading);
+            UIManager.SetInteractable(false);
+
+            yield return UIManager.Instance.PreloadUIsRoutine((percent) => Debug.Log(percent));
+            var loadUI = UIManager.ShowUI<LoadUI>(UILayer.Overlay);
+
+            loadUI.Fill = 0f;
+            var sequence = DOTween.Sequence()
+            .Append(loadUI.canvasGroup.DOFade(1f, 1f).ChangeStartValue(0f))
+            .Append(DOTweenUtils.DORunFloat((fill) => loadUI.Fill = fill, 0f, 1f, 1f).SetEase(Ease.InOutSine))
+            .AppendInterval(0.5f)
+            .AppendCallback(() => new ClassicController())
+            .Append(loadUI.canvasGroup.DOFade(0f, 1f))
+            .AppendCallback(OnFinishLoading);
 
             void OnFinishLoading()
             {
                 UIManager.SetInteractable(true);
-                UIManager.ReleaseUI(ui);
+                UIManager.ReleaseUI(loadUI);
             }
-        }, true);
+        }
     }
 
 }
