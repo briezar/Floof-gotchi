@@ -23,9 +23,9 @@ public class BackgroundFollow : MonoBehaviour
 
     private void Update()
     {
-        if (IsWithinBounds() || Mathf.Abs(_target.position.x) < Mathf.Abs(_bgRectTransform.position.x))
+        if (IsWithinBounds() || (!IsWithinBounds() && Mathf.Abs(_target.localPosition.x) < Mathf.Abs(_bgRectTransform.localPosition.x)))
         {
-            _bgRectTransform.position = new Vector3(-_target.position.x, 0, 0);
+            _bgRectTransform.localPosition = new Vector3(-_target.localPosition.x, 0);
         }
     }
 

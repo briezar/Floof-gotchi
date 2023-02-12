@@ -29,7 +29,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8527092357761102692}
   m_Father: {fileID: 1619249747331104488}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -110,7 +111,7 @@ RectTransform:
   - {fileID: 2414209824873606739}
   - {fileID: 7080094833781704233}
   m_Father: {fileID: 8836136418104248859}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -813,7 +814,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1619249747331104488}
-  - {fileID: 8527092357761102692}
   - {fileID: 7327308744967906963}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -996,7 +996,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5323545774142260295}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2232435a574f7984480f37718c610f6a, type: 3}
   m_Name: 
@@ -1078,14 +1078,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5897489992481560078}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3865226825002777969}
-  m_Father: {fileID: 8836136418104248859}
-  m_RootOrder: 1
+  m_Father: {fileID: 8852256006009179055}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1845,7 +1845,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7995315159261741939, guid: bb478572ecd54a04aabd18add19c4cd8, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: -0.000004053116
       objectReference: {fileID: 0}
     - target: {fileID: 7995315159261741939, guid: bb478572ecd54a04aabd18add19c4cd8, type: 3}
       propertyPath: m_SizeDelta.y

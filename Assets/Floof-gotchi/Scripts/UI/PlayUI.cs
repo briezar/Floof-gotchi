@@ -8,6 +8,7 @@ public enum Needs { Wellness, Hunger, Hygiene, Sleep }
 public class PlayUI : BaseUI
 {
     [SerializeField] private Transform _bottomBar;
+    [field: SerializeField] public FloofView FloofView { get; private set; }
 
     public Dictionary<Needs, NeedsIcon> NeedsIcons { get; private set; } = new();
 
