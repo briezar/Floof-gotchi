@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Utils
 {
@@ -26,6 +27,12 @@ public class Utils
     public static void StopCoroutine(Coroutine routine)
     {
         if (routine != null) { GameManager.Instance.StopCoroutine(routine); }
+    }
+
+
+    public static Vector3 GetRandomPoint(Vector3 min, Vector3 max)
+    {
+        return min + Random.Range(0f, 1f) * (max - min);
     }
 
 }

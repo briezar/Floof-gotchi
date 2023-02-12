@@ -17,13 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 647edb615ec0acc42811cca919629c16
   m_SerializeEntries:
-  - m_GUID: 52fb9ea77d855ab4fb51e9021422868a
-    m_Address: UI
+  - m_GUID: e30bb985e51d8d7409004d9a805374eb
+    m_Address: Assets/Floof-gotchi/Prefabs/UI_DynamicLoad
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
-  - m_GUID: e30bb985e51d8d7409004d9a805374eb
-    m_Address: Assets/Floof-gotchi/Prefabs/UI_DynamicLoad
+  - m_GUID: e99bf64212dff4c4eb53376e5f891dd1
+    m_Address: UI/LoadUI.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI

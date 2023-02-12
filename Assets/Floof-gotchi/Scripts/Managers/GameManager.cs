@@ -19,28 +19,43 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     private void Init()
     {
-        StartCoroutine(InitRoutine());
-        IEnumerator InitRoutine()
+        UIManager.SetInteractable(false);
+
+        UIManager.Instance.ShowAsync<LoadUI>(UILayer.Overlay, (loadUI) =>
         {
-            UIManager.SetInteractable(false);
+            StartCoroutine(InitRoutine(loadUI));
+        });
 
-            yield return UIManager.Instance.PreloadUIsRoutine((percent) => Debug.Log(percent));
-            var loadUI = UIManager.ShowUI<LoadUI>(UILayer.Overlay);
-
+        IEnumerator InitRoutine(LoadUI loadUI)
+        {
             loadUI.Fill = 0f;
-            var sequence = DOTween.Sequence()
-            .Append(loadUI.canvasGroup.DOFade(1f, 1f).ChangeStartValue(0f))
-            .Append(DOTweenUtils.DORunFloat((fill) => loadUI.Fill = fill, 0f, 1f, 1f).SetEase(Ease.InOutSine))
-            .AppendInterval(0.5f)
-            .AppendCallback(() => new ClassicController())
-            .Append(loadUI.canvasGroup.DOFade(0f, 1f))
-            .AppendCallback(OnFinishLoading);
-
-            void OnFinishLoading()
+            float maxFill = 0f;
+            UIManager.Instance.PreloadUIsRoutine((percent) =>
             {
-                UIManager.SetInteractable(true);
-                UIManager.ReleaseUI(loadUI);
+                maxFill = percent;
+            });
+
+            yield return loadUI.canvasGroup.DOFade(1f, 0.75f).ChangeStartValue(0f).SetDelay(0.25f).WaitForCompletion();
+
+            while (loadUI.Fill < 0.99f)
+            {
+                if (loadUI.Fill < maxFill)
+                {
+                    loadUI.Fill += Time.deltaTime;
+                }
+                yield return null;
             }
+            loadUI.Fill = 1f;
+
+            var sequence = DOTween.Sequence()
+            .AppendInterval(0.25f)
+            .AppendCallback(() => new ClassicController())
+            .Append(loadUI.canvasGroup.DOFade(0f, 0.75f));
+
+            yield return sequence.WaitForCompletion();
+
+            UIManager.SetInteractable(true);
+            UIManager.ReleaseUI(loadUI);
         }
     }
 

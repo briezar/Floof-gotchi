@@ -64,7 +64,21 @@ MonoBehaviour:
       - m_Id: 9a7faa91aca3553448a8bb717734016d
         m_Value: ServerData/[BuildTarget]
       - m_Id: c456cb756bfaf67489c2ae43b5be0c48
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: https://www.dropbox.com/sh/estc1pq7v0jgzgs/AAAytQNfeFdg-pu4qRcGV9u1a?dl=0/[BuildTarget]
+    - m_InheritedParent: 
+      m_Id: c1034568c8a8824479cbaff656f62cbe
+      m_ProfileName: Dev
+      m_Values:
+      - m_Id: 06410344b6f6cfb4d9a5fe01291f38be
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: 3ac6f6abeca6ed14ba8c356171f8a10a
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: d524ad26d0cc5094099557e227fd6562
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: 9a7faa91aca3553448a8bb717734016d
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: c456cb756bfaf67489c2ae43b5be0c48
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
     m_ProfileEntryNames:
     - m_Id: 06410344b6f6cfb4d9a5fe01291f38be
       m_Name: BuildTarget
@@ -86,7 +100,8 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - UI
-    - Preload
+    - DynamicLoad
+    - PreLoad
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 920ec2a3caaf17244868d8f777b99f16, type: 2}
@@ -100,7 +115,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 368eef56fdba51e419c6bf4981b916e6, type: 2}
   - {fileID: 11400000, guid: dc4e2f4f51e483e45895b5217b285ed4, type: 2}
   - {fileID: 11400000, guid: ae770096b2b9d3c4783fe0c756ebf225, type: 2}
-  m_ActiveProfileId: c6bd0095965033d46b10c579b5e167cd
+  m_ActiveProfileId: c1034568c8a8824479cbaff656f62cbe
   m_HostingServicesManager:
     m_HostingServiceInfos: []
     m_Settings: {fileID: 11400000}

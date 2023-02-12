@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Needs { Wellness, Hungry, Hygiene, Sleep }
+public enum Needs { Wellness, Hunger, Hygiene, Sleep }
 
 public class PlayUI : BaseUI
 {
