@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FloofController
 {
-    private float _wellness, _hunger, _hygiene, _sleep;
+    private float _happiness, _hunger, _hygiene, _sleep;
     private FloofView _view;
 
     public FloofController(FloofView floofView)
