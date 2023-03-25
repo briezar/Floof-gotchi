@@ -2,48 +2,76 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System;
+using Random = UnityEngine.Random;
 
 public class FloofView : MonoBehaviour
 {
-    [SerializeField] private RectTransform _moveSpace;
     [SerializeField] private Animator _animator;
+    [SerializeField] private float _speed;
 
-    private Vector2 _min, _max;
+    private RectTransform _moveSpace;
+    private Vector3[] _moveSpaceCorners;
 
-    private void Awake()
+    private Coroutine _wanderRoutine;
+    private Tween _moveTween;
+
+    public void Setup(RectTransform moveSpace)
     {
-        _min = _moveSpace.rect.min;
-        _max = _moveSpace.rect.max;
-        StartMovingRandomly();
+        _moveSpace = moveSpace;
+        UpdateWorldCorners();
     }
 
-    public void StartMovingRandomly()
+    public void StartWandering()
     {
-        StartCoroutine(MoveRoutine());
+        _wanderRoutine = StartCoroutine(MoveRoutine());
         IEnumerator MoveRoutine()
         {
             while (true)
             {
-                _animator.Play(Anim.FloofWalk);
-                var destination = GetRandomLocalPos();
-                bool isFacingRight = transform.localPosition.x < destination.x;
-                transform.localScale = new Vector3(isFacingRight ? 1 : -1, transform.localScale.y);
-                yield return transform.DOLocalMove(destination, 100f).SetSpeedBased().WaitForCompletion();
-                _animator.Play(Anim.FloofIdle);
+                yield return Move(GetRandomPos());
                 yield return new WaitForSeconds(Random.Range(1f, 4f));
             }
         }
     }
 
-    public void StopMoving()
+    public YieldInstruction Move(Vector3 destination)
     {
-        transform.DOKill();
-        _animator.Play(Anim.FloofIdle);
+        _animator.Play(Anim.FloofWalk);
+        bool isFacingRight = transform.position.x < destination.x;
+        transform.localScale = new Vector3(isFacingRight ? 1 : -1, transform.localScale.y);
+
+        _moveTween = transform.DOMove(destination, _speed).SetSpeedBased()
+        .OnComplete(() =>
+        {
+            _animator.Play(Anim.FloofIdle);
+        });
+        return _moveTween.WaitForCompletion();
     }
 
-    private Vector2 GetRandomLocalPos()
+    public void StopMoving()
     {
-        return Utils.GetRandomPoint(_min, _max);
+        if (_wanderRoutine != null) { StopCoroutine(_wanderRoutine); }
+        _moveTween.Complete();
+    }
+
+    private void UpdateWorldCorners()
+    {
+        _moveSpaceCorners = _moveSpace.GetWorldCorners();
+    }
+
+    private Vector2 GetRandomPos()
+    {
+        var xMin = _moveSpaceCorners[0].x;
+        var yMin = _moveSpaceCorners[0].y;
+        var xMax = _moveSpaceCorners[2].x;
+        var yMax = _moveSpaceCorners[2].y;
+
+        var x = Random.Range(xMin, xMax);
+        var y = Random.Range(yMin, yMax);
+        var pos = new Vector2(x, y);
+
+        return pos;
     }
 
 }

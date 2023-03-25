@@ -5,11 +5,12 @@ using UnityEngine;
 public class FloofController
 {
     private float _happiness, _hunger, _hygiene, _sleep;
-    private FloofView _view;
+    public FloofView Floof { get; private set; }
 
     public FloofController(FloofView floofView)
     {
-        _view = floofView;
+        Floof = floofView;
+        Floof.StartWandering();
     }
 
 }

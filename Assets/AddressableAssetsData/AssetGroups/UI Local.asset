@@ -27,6 +27,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
+  - m_GUID: 67be95e0d0ff9814cbc973c78670b658
+    m_Address: UI/SceneUI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - UI
+    - PreLoad
+  - m_GUID: 651ea17097657ff4287433ab2ffc0fd9
+    m_Address: Prefabs/FloofView.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 54391f2a50e1dc043b87717b63195d43, type: 2}
   m_SchemaSet:

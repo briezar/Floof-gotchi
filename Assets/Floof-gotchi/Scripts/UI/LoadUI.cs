@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadUI : BaseUI
+public class LoadUI : CanvasCameraUI
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private Image _fillImg;

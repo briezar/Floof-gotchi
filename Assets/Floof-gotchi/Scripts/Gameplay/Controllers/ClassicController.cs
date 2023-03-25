@@ -6,13 +6,20 @@ using UnityEngine;
 
 public class ClassicController
 {
-    private PlayUI _gameView;
+    private PlayUI _playUI;
+    private SceneUI _sceneUI;
     private FloofController _floofController;
 
     public ClassicController()
     {
-        _gameView = UIManager.ShowUI<PlayUI>();
-        _floofController = new FloofController(_gameView.FloofView);
+        _playUI = UIManager.ShowUI<PlayUI>();
+        _sceneUI = UIManager.ShowWorldUI<SceneUI>();
+        AssetManager.InstantiateAsync<FloofView>("Prefabs/FloofView.prefab", _sceneUI.MoveSpace, (floofView) =>
+        {
+            _sceneUI.SetupCameraFollow(floofView.transform);
+            floofView.Setup(_sceneUI.MoveSpace);
+            _floofController = new FloofController(floofView);
+        });
     }
 
 }

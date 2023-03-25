@@ -5,10 +5,9 @@ using UnityEngine;
 
 public enum Needs { Wellness, Hunger, Hygiene, Sleep }
 
-public class PlayUI : BaseUI
+public class PlayUI : CanvasCameraUI
 {
     [SerializeField] private Transform _bottomBar;
-    [field: SerializeField] public FloofView FloofView { get; private set; }
 
     public Dictionary<Needs, NeedsIcon> NeedsIcons { get; private set; } = new();
 

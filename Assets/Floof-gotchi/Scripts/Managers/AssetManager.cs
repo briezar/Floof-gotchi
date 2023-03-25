@@ -45,10 +45,10 @@ public class AssetManager
 
             Addressables.Release(loadResourceLocationsHandle);
 
-            // foreach (var item in preloadedAssets)
-            // {
-            //     Debug.Log(item.Key + " - " + item.Value.name);
-            // }
+            foreach (var item in preloadedAssets)
+            {
+                Debug.Log($"Preload ID {item.Key} => {item.Value.name}");
+            }
 
             onLoaded?.Invoke(preloadedAssets);
         }
