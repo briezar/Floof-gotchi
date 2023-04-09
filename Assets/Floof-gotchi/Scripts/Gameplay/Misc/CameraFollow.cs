@@ -73,12 +73,12 @@ public class CameraFollow : MonoBehaviour
 
     private bool CanMoveHorizontal()
     {
-        return FollowHorizontal && IsWithinBounds(Axis.Horizontal) || (!IsWithinBounds(Axis.Horizontal) && TargetPassedMidpoint(Axis.Horizontal));
+        return FollowHorizontal && IsWithinBounds(Axis.Horizontal) || TargetPassedMidpoint(Axis.Horizontal);
     }
 
     private bool CanMoveVertical()
     {
-        return FollowVertical && IsWithinBounds(Axis.Vertical) || (!IsWithinBounds(Axis.Vertical) && TargetPassedMidpoint(Axis.Vertical));
+        return FollowVertical && IsWithinBounds(Axis.Vertical) || TargetPassedMidpoint(Axis.Vertical);
     }
 
     private bool TargetPassedMidpoint(Axis axis)

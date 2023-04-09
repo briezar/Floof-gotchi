@@ -24,6 +24,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public static bool IsInteractable => Instance._blockCount <= 0;
 
     private List<CanvasCameraUI> _currentUIs = new();
+    private List<WorldCameraUI> _worldUIs = new();
     private Dictionary<string, BaseUI> _preloadedUIs = new();
 
     private int _blockCount = 0;
@@ -79,9 +80,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         return ui;
     }
 
+    private static T GetInstantiatedWorldUI<T>() where T : WorldCameraUI
+    {
+        var ui = (T)Instance._worldUIs.Find((ui) => ui.GetType() == typeof(T));
+        return ui;
+    }
+
     public static void ShowAsyncWorldUI<T>(Action<T> onComplete = null) where T : WorldCameraUI
     {
-        Instance.ShowAsyncWorldCamera<T>(onComplete);
+        Instance.ShowAsyncWorldSpaceUI<T>(onComplete);
     }
 
     public static void ShowAsyncUI<T>(Action<T> onComplete = null) where T : CanvasCameraUI
@@ -108,7 +115,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         if (instantiate)
         {
             AssetManager.InstantiateAsync<T>(GetAddressUI<T>(), UILayers[uiLayer], OnComplete);
-            // ui = GameObject.Instantiate<T>((T)_preloadedUIs[typeof(T).Name], UILayers[uILayer]);
         }
         else
         {
@@ -122,7 +128,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-    private void ShowAsyncWorldCamera<T>(Action<T> onComplete) where T : WorldCameraUI
+    private void ShowAsyncWorldSpaceUI<T>(Action<T> onComplete) where T : WorldCameraUI
     {
         T ui = null;
         ui = GetPreloadedUI<T>();
@@ -136,9 +142,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-    /// <summary>
-    /// Only use when UI is preloaded!
-    /// </summary>
     public static T ShowUI<T>(UILayer uILayer = UILayer.Main) where T : CanvasCameraUI
     {
         var name = typeof(T).Name;
@@ -149,12 +152,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             ui = GetPreloadedUI<T>();
             if (ui == null)
             {
-                Debug.LogError(name + " is not preloaded!");
-                return null;
+                ui = AssetManager.Instantiate<T>(GetAddressUI<T>(), Instance.UILayers[uILayer]);
             }
-            ui = GameObject.Instantiate<T>(ui, Instance.UILayers[uILayer]);
-            Instance._currentUIs.Add(ui);
-
         }
 
         return Instance.Show(ui);
@@ -250,7 +249,10 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     }
     public static void ReleaseUI(CanvasCameraUI ui, bool releaseMemory = false)
     {
-        Instance._currentUIs.Remove(ui);
+        if (!Instance._currentUIs.Remove(ui))
+        {
+            Debug.LogWarning($"Current UIs does not contain {ui.name}");
+        }
         ui.DestroyGameObject(releaseMemory);
     }
 

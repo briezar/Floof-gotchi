@@ -1,10 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
-using System;
 
 public class AssetManager
 {
@@ -47,10 +47,51 @@ public class AssetManager
 
             foreach (var item in preloadedAssets)
             {
-                Debug.Log($"Preload ID {item.Key} => {item.Value.name}");
+                Debug.Log($"Preload ID: {item.Key} => {item.Value.name}");
             }
 
             onLoaded?.Invoke(preloadedAssets);
+        }
+    }
+
+    public static AsyncOperationHandle CreateGroupOperation(params AsyncOperationHandle[] handles)
+    {
+        return Addressables.ResourceManager.CreateGenericGroupOperation(handles.ToList());
+    }
+
+    public static AsyncOperationHandle LoadTextAsync(string path, Action<string> onComplete = null)
+    {
+        var handle = Addressables.LoadAssetAsync<TextAsset>(path);
+        handle.Completed += (opHandle) =>
+        {
+            onComplete?.Invoke(opHandle.Result.text);
+            Addressables.Release(opHandle);
+        };
+        return handle;
+    }
+
+    public static void LoadAssetsAsync<T>(IList<AssetReference> keys, Action<Dictionary<string, T>> onLoaded) where T : UnityEngine.Object
+    {
+        Utils.StartCoroutine(LoadKeysRoutine());
+        IEnumerator LoadKeysRoutine()
+        {
+            var locationsHandle = Addressables.LoadResourceLocationsAsync(keys, Addressables.MergeMode.Union, typeof(T));
+
+            if (!locationsHandle.IsDone) { yield return locationsHandle; }
+
+            var loadedAssets = new Dictionary<string, T>();
+
+            var resultsHandle = Addressables.LoadAssetsAsync<T>(locationsHandle.Result, (asset) => loadedAssets.Add(asset.name, asset));
+            if (!resultsHandle.IsDone) { yield return resultsHandle; }
+
+            Addressables.Release(locationsHandle);
+
+            foreach (var item in loadedAssets)
+            {
+                Debug.Log($"Preload ID {item.Key} => {item.Value.name}");
+            }
+
+            onLoaded?.Invoke(loadedAssets);
         }
     }
 
@@ -60,20 +101,38 @@ public class AssetManager
         handle.Completed += (opHandle) => { onComplete?.Invoke(opHandle.Result.GetComponent<T>()); };
     }
 
-    public static void InstantiateAsync<T>(string path, Transform parent = null, Action<T> onComplete = null) where T : Component
+    public static T Instantiate<T>(string path, Transform parent = null) where T : Component
+    {
+        var gameObject = Addressables.InstantiateAsync(path, parent).WaitForCompletion();
+        if (gameObject == null)
+        {
+            Debug.LogWarning(gameObject.name + " is null");
+            return null;
+        }
+
+        if (!gameObject.TryGetComponent<T>(out var component))
+        {
+            Debug.LogWarning("GameObject does not contain " + typeof(T).Name);
+        }
+        return component;
+    }
+
+    public static AsyncOperationHandle InstantiateAsync<T>(string path, Transform parent = null, Action<T> onComplete = null) where T : Component
     {
         var handle = Addressables.InstantiateAsync(path, parent);
         handle.Completed += (opHandle) =>
         {
-            try
+            if (opHandle.Result.TryGetComponent<T>(out var instantiatedAsset))
             {
-                onComplete?.Invoke(opHandle.Result.GetComponent<T>());
+                onComplete?.Invoke(instantiatedAsset);
             }
-            catch (NullReferenceException)
+            else
             {
                 Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
             }
         };
+
+        return handle;
     }
 
 }

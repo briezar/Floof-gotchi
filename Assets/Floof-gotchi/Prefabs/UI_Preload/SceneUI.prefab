@@ -36,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1921.3518, y: 0}
+  m_SizeDelta: {x: 4000, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &924095755765630724
 CanvasRenderer:
@@ -129,6 +129,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MoveSpace>k__BackingField: {fileID: 6102461042837131361}
   _bgImage: {fileID: 6221370989800081618}
+  _bgSpriteRefs:
+  - m_AssetGUID: 8b1bd3642799af74c94ee71c33ff8e54
+    m_SubObjectName: living-room
+    m_SubObjectType: UnityEngine.Sprite, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 517c4067e73777944b45fedc2bb6fb76
+    m_SubObjectName: bathroom
+    m_SubObjectType: UnityEngine.Sprite, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_EditorAssetChanged: 0
 --- !u!1 &8304089368943080715
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,6 +173,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -530}
-  m_SizeDelta: {x: 780, y: 480}
+  m_AnchoredPosition: {x: 0, y: -650}
+  m_SizeDelta: {x: 1100, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}

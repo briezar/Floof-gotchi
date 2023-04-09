@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using System.IO;
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
@@ -21,10 +22,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         UIManager.SetInteractable(false);
 
-        UIManager.Instance.ShowAsync<LoadUI>(UILayer.Overlay, (loadUI) =>
-        {
-            StartCoroutine(InitRoutine(loadUI));
-        });
+        var loadUI = UIManager.ShowUI<LoadUI>(UILayer.Overlay);
+        StartCoroutine(InitRoutine(loadUI));
 
         IEnumerator InitRoutine(LoadUI loadUI)
         {
@@ -48,8 +47,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             loadUI.Fill = 1f;
 
             var sequence = DOTween.Sequence()
-            .AppendInterval(0.25f)
             .AppendCallback(() => new ClassicController())
+            .AppendInterval(0.25f)
             .Append(loadUI.canvasGroup.DOFade(0f, 0.75f));
 
             yield return sequence.WaitForCompletion();

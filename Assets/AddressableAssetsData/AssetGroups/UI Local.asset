@@ -33,8 +33,16 @@ MonoBehaviour:
     m_SerializedLabels:
     - UI
     - PreLoad
-  - m_GUID: 651ea17097657ff4287433ab2ffc0fd9
-    m_Address: Prefabs/FloofView.prefab
+  - m_GUID: b3fd8153dd54ccf4d8bf2ef3fc71ef97
+    m_Address: Data/SceneData.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8b1bd3642799af74c94ee71c33ff8e54
+    m_Address: Assets/Floof-gotchi/Textures/living-room
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 517c4067e73777944b45fedc2bb6fb76
+    m_Address: Assets/Floof-gotchi/Textures/bathroom
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

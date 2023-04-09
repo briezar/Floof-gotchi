@@ -10,6 +10,12 @@ public class FloofController
     public FloofController(FloofView floofView)
     {
         Floof = floofView;
+        // Floof.StartWandering();
+    }
+
+    public void ResetFloof()
+    {
+        Floof.StopMoving();
         Floof.StartWandering();
     }
 

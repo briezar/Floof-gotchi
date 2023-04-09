@@ -2,72 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class ExtensionMethods
+public static class ObjectExtensions
 {
-    #region String
-    public static bool IsNullOrEmpty(this string text)
-    {
-        return string.IsNullOrEmpty(text);
-    }
-
-    public static string LastChar(this string text)
-    {
-        return text[text.Length - 1].ToString();
-    }
-
-    #endregion
-
-
-    #region List
-
-    /// <summary> Remove and return the last element of a list. </summary>
-    public static T Pop<T>(this List<T> list)
-    {
-        if (list.Count == 0) { return default(T); }
-        var lastElem = list[list.Count - 1];
-        list.RemoveAt(list.Count - 1);
-        return lastElem;
-    }
-
-    /// <summary> Get the last element of a list, null if list has 0 elements. </summary>
-    public static T GetLast<T>(this List<T> list)
-    {
-        var lastElem = list.Count > 0 ? list[list.Count - 1] : default(T);
-        return lastElem;
-    }
-
-    public static T GetRandom<T>(this List<T> list)
-    {
-        return list[Random.Range(0, list.Count)];
-    }
-
-    public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
-    {
-        return collection == null || collection.Count == 0;
-    }
-
-
-    #endregion
-
-
-    #region Array
-
-    public static List<T> ToList<T>(T[] array)
-    {
-        var list = new List<T>();
-        list.AddRange(array);
-        return list;
-    }
-
-    public static T GetRandom<T>(this T[] array)
-    {
-        return array[Random.Range(0, array.Length)];
-    }
-
-    #endregion
-
-
-    #region GameObject
     public static void DestroyGameObject(this Component component, bool releaseMemory = false)
     {
         if (releaseMemory)
@@ -80,9 +16,6 @@ public static class ExtensionMethods
         }
     }
 
-    #endregion
-
-
     public static T ForceGetComponent<T>(this Component component) where T : Component
     {
         if (!component.TryGetComponent<T>(out var result))
@@ -91,6 +24,10 @@ public static class ExtensionMethods
         }
         return result;
     }
+}
+
+public static class RectTransformExtensions
+{
 
     public static Vector3[] GetWorldCorners(this RectTransform rectTransform)
     {
@@ -103,10 +40,7 @@ public static class ExtensionMethods
     {
         return sprite.rect.width / sprite.rect.height;
     }
-}
 
-public static class RectTransformExtensions
-{
     public static void HeightControlsWidth(this RectTransform rectTransform, float aspectRatio)
     {
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rectTransform.rect.height * aspectRatio);

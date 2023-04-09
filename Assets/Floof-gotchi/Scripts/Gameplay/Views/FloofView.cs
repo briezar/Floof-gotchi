@@ -19,14 +19,17 @@ public class FloofView : MonoBehaviour
     public void Setup(RectTransform moveSpace)
     {
         _moveSpace = moveSpace;
+        transform.position = moveSpace.position;
         UpdateWorldCorners();
     }
 
-    public void StartWandering()
+    public void StartWandering(float delay = 0)
     {
+        StopMoving();
         _wanderRoutine = StartCoroutine(MoveRoutine());
         IEnumerator MoveRoutine()
         {
+            yield return new WaitForSeconds(delay);
             while (true)
             {
                 yield return Move(GetRandomPos());
