@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LeavePopup : Popup
+public class ConfirmPopup : Popup
 {
     public override void OnBack()
     {

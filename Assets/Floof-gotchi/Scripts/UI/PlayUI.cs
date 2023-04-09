@@ -3,26 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Needs { Wellness, Hunger, Hygiene, Sleep }
-
-public class PlayUI : CanvasCameraUI
+namespace ClassicGame
 {
-    [SerializeField] private Transform _bottomBar;
+    public enum Needs { Wellness, Hunger, Hygiene, Sleep }
 
-    public Dictionary<Needs, NeedsIcon> NeedsIcons { get; private set; } = new();
-
-    public override void OnInit()
+    public class PlayUI : CanvasCameraUI
     {
-        var allNeeds = _bottomBar.GetComponentsInChildren<NeedsIcon>();
-        for (int i = 0; i < allNeeds.Length; i++)
+        [SerializeField] private Transform _bottomBar;
+
+        public Dictionary<Needs, NeedsIcon> NeedsIcons { get; private set; } = new();
+
+        public override void OnInit()
         {
-            NeedsIcons.Add(Enum.Parse<Needs>(allNeeds[i].name), allNeeds[i]);
+            var allNeeds = _bottomBar.GetComponentsInChildren<NeedsIcon>();
+            for (int i = 0; i < allNeeds.Length; i++)
+            {
+                NeedsIcons.Add(Enum.Parse<Needs>(allNeeds[i].name), allNeeds[i]);
+            }
         }
-    }
 
-    public override void OnBack()
-    {
-        UIManager.ShowAsyncPopup<LeavePopup>();
-    }
+        public override void OnBack()
+        {
+            UIManager.ShowAsyncPopup<ConfirmPopup>();
+        }
 
+    }
 }

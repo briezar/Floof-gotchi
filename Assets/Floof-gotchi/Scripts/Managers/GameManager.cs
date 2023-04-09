@@ -5,6 +5,12 @@ using DG.Tweening;
 using UnityEngine;
 using System.IO;
 
+public enum GameScene
+{
+    LivingRoom,
+    BathRoom
+}
+
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     private void Awake()
@@ -47,7 +53,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             loadUI.Fill = 1f;
 
             var sequence = DOTween.Sequence()
-            .AppendCallback(() => new ClassicController())
+            .AppendCallback(() => new ClassicGame.MainController())
             .AppendInterval(0.25f)
             .Append(loadUI.canvasGroup.DOFade(0f, 0.75f));
 
