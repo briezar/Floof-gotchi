@@ -120,19 +120,27 @@ public class AssetManager
     public static AsyncOperationHandle InstantiateAsync<T>(string path, Transform parent = null, Action<T> onComplete = null) where T : Component
     {
         var handle = Addressables.InstantiateAsync(path, parent);
-        handle.Completed += (opHandle) =>
+
+        if (handle.IsDone)
         {
-            if (opHandle.Result.TryGetComponent<T>(out var instantiatedAsset))
-            {
-                onComplete?.Invoke(instantiatedAsset);
-            }
-            else
-            {
-                Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
-            }
-        };
+            Completed(handle);
+        }
+        else
+        {
+            handle.Completed += Completed;
+        }
 
         return handle;
+
+        void Completed(AsyncOperationHandle<GameObject> handle)
+        {
+            if (handle.Result.TryGetComponent<T>(out var instantiatedAsset))
+            {
+                onComplete?.Invoke(instantiatedAsset);
+                return;
+            }
+            Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
+        }
     }
 
 }

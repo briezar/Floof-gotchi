@@ -104,22 +104,18 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public void ShowAsync<T>(UILayer uiLayer, Action<T> onComplete, bool singleInstance = true) where T : CanvasCameraUI
     {
         T ui = null;
-        bool instantiate = !singleInstance;
 
         if (singleInstance)
         {
-            ui = GetPreloadedUI<T>();
-            if (ui == null) { instantiate = true; }
+            ui = GetInstantiatedUI<T>();
+            if (ui != null)
+            {
+                OnComplete(ui);
+                return;
+            }
         }
 
-        if (instantiate)
-        {
-            AssetManager.InstantiateAsync<T>(GetAddressUI<T>(), UILayers[uiLayer], OnComplete);
-        }
-        else
-        {
-            OnComplete(ui);
-        }
+        AssetManager.InstantiateAsync<T>(GetAddressUI<T>(), UILayers[uiLayer], OnComplete);
 
         void OnComplete(T targetUI)
         {
@@ -142,18 +138,14 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-    public static T ShowUI<T>(UILayer uILayer = UILayer.Main) where T : CanvasCameraUI
+    public static T ShowUI<T>(UILayer uiLayer = UILayer.Main) where T : CanvasCameraUI
     {
         var name = typeof(T).Name;
         var ui = GetInstantiatedUI<T>();
 
         if (ui == null)
         {
-            ui = GetPreloadedUI<T>();
-            if (ui == null)
-            {
-                ui = AssetManager.Instantiate<T>(GetAddressUI<T>(), Instance.UILayers[uILayer]);
-            }
+            ui = AssetManager.Instantiate<T>(GetAddressUI<T>(), Instance.UILayers[uiLayer]);
         }
 
         return Instance.Show(ui);
@@ -165,10 +157,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         var ui = GetPreloadedUI<T>();
         if (ui == null)
         {
-            Debug.LogError(name + " is not preloaded!");
-            return null;
+            Debug.LogWarning(name + " is not preloaded!");
         }
-        ui = GameObject.Instantiate<T>(ui, Instance._worldCanvasGameRect);
+        ui = AssetManager.Instantiate<T>(GetAddressUI<T>(), Instance._worldCanvasGameRect);
         return ui;
     }
 

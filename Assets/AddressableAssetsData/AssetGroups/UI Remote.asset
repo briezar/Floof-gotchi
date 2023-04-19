@@ -24,7 +24,7 @@ MonoBehaviour:
     - UI
     - PreLoad
   - m_GUID: cc72fab626dd2bd4abaf0be58887077f
-    m_Address: UI/LeavePopup.prefab
+    m_Address: UI/ConfirmPopup.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - UI
