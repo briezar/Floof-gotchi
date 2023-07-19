@@ -22,7 +22,7 @@ namespace ClassicGame
 
             IEnumerator InitRoutine()
             {
-                yield return AssetManager.LoadTextAsync("Data/SceneData.json", (text) => _sceneDataCenter = JsonUtility.FromJson<SceneDataCenter>(text));
+                yield return AssetManager.LoadAssetByPath<TextAsset>("Data/SceneData.json", (asset) => _sceneDataCenter = JsonUtility.FromJson<SceneDataCenter>(asset.text));
                 yield return AssetManager.InstantiateAsync<FloofView>("Prefabs/FloofView.prefab", _sceneUI.MoveSpace, (floofView) =>
                 {
                     _sceneUI.SetupCameraFollow(floofView.transform);

@@ -13,7 +13,7 @@ public enum UILayer
 }
 public class UIManager : SingletonMonoBehaviour<UIManager>
 {
-    [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference[] _uiLabelPreload;
+    [SerializeField] private List<UnityEngine.AddressableAssets.AssetLabelReference> _uiLabelPreload;
     [SerializeField] private Camera _uiCamera;
     [SerializeField] private EventSystem _eventSystem;
     [SerializeField] private Transform _mainCanvasGameRect, _worldCanvasGameRect;
@@ -55,9 +55,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-    public Coroutine PreloadUIsRoutine(Action<float> actionPercentComplete)
+    public void PreLoadUIs(Action<float> actionPercentComplete)
     {
-        return AssetManager.PreloadAssetLabelRef<BaseUI>(_uiLabelPreload, (value) => { _preloadedUIs = value; }, actionPercentComplete);
+        AssetManager.LoadAssetsByLabel<BaseUI>(_uiLabelPreload, (value) =>
+        {
+            foreach (var item in value)
+            {
+                _preloadedUIs.TryAdd(item.name, item);
+            }
+        }, actionPercentComplete);
     }
 
     private static string GetAddressUI<T>()

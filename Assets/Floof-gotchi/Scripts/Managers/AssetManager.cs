@@ -8,74 +8,64 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 public class AssetManager
 {
-    public static Coroutine PreloadAssetLabelRef<T>(AssetLabelReference[] assetLabelRefs, Action<Dictionary<string, T>> onLoaded, Action<float> actionPercentComplete = null) where T : Component
+    public static void LoadAssetsByLabel<T>(List<AssetLabelReference> assetLabelRefs, Action<List<T>> onLoaded, Action<float> actionPercentComplete = null) where T : UnityEngine.Object
     {
-        var labels = new HashSet<string>();
-        foreach (var labelRef in assetLabelRefs)
+        Utils.StartCoroutine(LoadRoutine());
+
+        IEnumerator LoadRoutine()
         {
-            labels.Add(labelRef.labelString);
-        }
-        return Utils.StartCoroutine(PreloadAssetLabelRefRoutine());
-        IEnumerator PreloadAssetLabelRefRoutine()
-        {
-            var preloadedAssets = new Dictionary<string, T>();
-            var loadResourceLocationsHandle = Addressables.LoadResourceLocationsAsync(labels, Addressables.MergeMode.Intersection, typeof(GameObject));
+            var isComponent = typeof(Component).IsAssignableFrom(typeof(T));
+            var loadedAssets = new List<T>();
+            var loadResourceLocationsHandle = Addressables.LoadResourceLocationsAsync(assetLabelRefs, Addressables.MergeMode.Intersection, isComponent ? typeof(GameObject) : typeof(T));
 
             if (!loadResourceLocationsHandle.IsDone) { yield return loadResourceLocationsHandle; }
 
             //start each location loading
             var operationList = new List<AsyncOperationHandle>();
 
+            AsyncOperationHandle loadAssetHandle;
+
             foreach (var location in loadResourceLocationsHandle.Result)
             {
-                var loadAssetHandle = Addressables.LoadAssetAsync<GameObject>(location);
-                loadAssetHandle.Completed += (obj) => { preloadedAssets.Add(obj.Result.name, obj.Result.GetComponent<T>()); };
+                if (isComponent)
+                {
+                    loadAssetHandle = LoadAssetByLabel<GameObject>(location, (prefab) => loadedAssets.Add(prefab.GetComponent<T>()));
+                }
+                else
+                {
+                    loadAssetHandle = LoadAssetByLabel<T>(location, (asset) => loadedAssets.Add(asset));
+                }
+
                 operationList.Add(loadAssetHandle);
             }
 
             //create a GroupOperation to wait on all the above loads at once. 
-            var groupOp = Addressables.ResourceManager.CreateGenericGroupOperation(operationList);
+            var groupOp = Addressables.ResourceManager.CreateGenericGroupOperation(operationList, true);
 
             while (!groupOp.IsDone)
             {
                 actionPercentComplete?.Invoke(groupOp.PercentComplete);
                 yield return null;
             }
-            actionPercentComplete?.Invoke(1f);
+            actionPercentComplete?.Invoke(1);
 
             Addressables.Release(loadResourceLocationsHandle);
 
-            foreach (var item in preloadedAssets)
+            foreach (var item in loadedAssets)
             {
-                Debug.Log($"Preload ID: {item.Key} => {item.Value.name}");
+                Debug.Log($"Loaded: {item.name}");
             }
 
-            onLoaded?.Invoke(preloadedAssets);
+            onLoaded?.Invoke(loadedAssets);
         }
     }
 
-    public static AsyncOperationHandle CreateGroupOperation(params AsyncOperationHandle[] handles)
+    public static void LoadAssetsAsync<T>(IList<AssetReference> assetRefs, Action<Dictionary<string, T>> onLoaded) where T : UnityEngine.Object
     {
-        return Addressables.ResourceManager.CreateGenericGroupOperation(handles.ToList());
-    }
-
-    public static AsyncOperationHandle LoadTextAsync(string path, Action<string> onComplete = null)
-    {
-        var handle = Addressables.LoadAssetAsync<TextAsset>(path);
-        handle.Completed += (opHandle) =>
+        Utils.StartCoroutine(LoadRoutine());
+        IEnumerator LoadRoutine()
         {
-            onComplete?.Invoke(opHandle.Result.text);
-            Addressables.Release(opHandle);
-        };
-        return handle;
-    }
-
-    public static void LoadAssetsAsync<T>(IList<AssetReference> keys, Action<Dictionary<string, T>> onLoaded) where T : UnityEngine.Object
-    {
-        Utils.StartCoroutine(LoadKeysRoutine());
-        IEnumerator LoadKeysRoutine()
-        {
-            var locationsHandle = Addressables.LoadResourceLocationsAsync(keys, Addressables.MergeMode.Union, typeof(T));
+            var locationsHandle = Addressables.LoadResourceLocationsAsync(assetRefs, Addressables.MergeMode.Union);
 
             if (!locationsHandle.IsDone) { yield return locationsHandle; }
 
@@ -95,10 +85,18 @@ public class AssetManager
         }
     }
 
-    public static void LoadAsync<T>(string path, Action<T> onComplete = null) where T : Component
+    public static AsyncOperationHandle LoadAssetByLabel<T>(IResourceLocation location, Action<T> onComplete = null) where T : UnityEngine.Object
+    {
+        var handle = Addressables.LoadAssetAsync<T>(location);
+        handle.Completed += (opHandle) => { onComplete?.Invoke(opHandle.Result); };
+        return handle;
+    }
+
+    public static AsyncOperationHandle LoadAssetByPath<T>(string path, Action<T> onComplete = null) where T : UnityEngine.Object
     {
         var handle = Addressables.LoadAssetAsync<T>(path);
-        handle.Completed += (opHandle) => { onComplete?.Invoke(opHandle.Result.GetComponent<T>()); };
+        handle.Completed += (opHandle) => { onComplete?.Invoke(opHandle.Result); };
+        return handle;
     }
 
     public static T Instantiate<T>(string path, Transform parent = null) where T : Component
@@ -134,12 +132,11 @@ public class AssetManager
 
         void Completed(AsyncOperationHandle<GameObject> handle)
         {
-            if (handle.Result.TryGetComponent<T>(out var instantiatedAsset))
+            if (!handle.Result.TryGetComponent<T>(out var instantiatedAsset))
             {
-                onComplete?.Invoke(instantiatedAsset);
-                return;
+                Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
             }
-            Debug.LogError($"Missing or incorrect component: {typeof(T).Name}");
+            onComplete?.Invoke(instantiatedAsset);
         }
     }
 

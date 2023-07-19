@@ -35,7 +35,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         {
             loadUI.Fill = 0f;
             float maxFill = 0f;
-            UIManager.Instance.PreloadUIsRoutine((percent) =>
+            UIManager.Instance.PreLoadUIs((percent) =>
             {
                 maxFill = percent;
             });
