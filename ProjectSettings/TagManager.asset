@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: View
+    uniqueID: 2591670319
+    locked: 0
+  - name: Popup
+    uniqueID: 1889098745
+    locked: 0
+  - name: OnTop
+    uniqueID: 452508681
+    locked: 0
+  - name: Transition
+    uniqueID: 171173417
+    locked: 0

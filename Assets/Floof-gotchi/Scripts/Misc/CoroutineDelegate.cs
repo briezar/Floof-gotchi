@@ -5,7 +5,9 @@ using UnityEngine;
 
 public abstract class CoroutineDelegate
 {
-    private MonoBehaviour _coroutineRunner;
+    protected MonoBehaviour _coroutineRunner;
+
+    public CoroutineDelegate() { }
     public CoroutineDelegate(MonoBehaviour coroutineRunner)
     {
         _coroutineRunner = coroutineRunner;
