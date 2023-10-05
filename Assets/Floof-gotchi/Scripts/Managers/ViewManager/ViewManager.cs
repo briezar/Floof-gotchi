@@ -19,7 +19,7 @@ namespace Floof
         [SerializeField] private Transform _viewLayer;
         [SerializeField] private AnimationController _animation;
 
-        private Dictionary<string, string> _nameToAddressMap;
+        private Dictionary<string, PrefabReference> _nameToAddressMap;
 
         private List<BaseView> _views;
 
@@ -66,7 +66,8 @@ namespace Floof
             {
                 var startIndex = key.LastIndexOf('/') + 1;
                 var viewName = key.Substring(startIndex).Replace(".prefab", "");
-                _nameToAddressMap.Add(viewName, key);
+                var assetRef = new PrefabReference(key);
+                _nameToAddressMap.Add(viewName, assetRef);
             }
         }
         private void OnDestroy()
@@ -149,14 +150,14 @@ namespace Floof
             Instance._animation.EnableLoading(enable, text);
         }
 
-        public static T Show<T>() where T : BaseView
+        public async static UniTask<T> Show<T>() where T : BaseView
         {
-            return Instance._Show(typeof(T).Name) as T;
+            return await Instance._Show(typeof(T).Name) as T;
         }
 
-        private async UniTask<BaseView> _Show(string viewName, string extraPath = null)
+        private async UniTask<BaseView> _Show(string viewName)
         {
-            var view = await GetView(viewName, extraPath);
+            var view = await GetView(viewName);
             if (view == null)
             {
                 Debug.LogError("View prefab not found " + viewName);
@@ -205,36 +206,37 @@ namespace Floof
             }
         }
 
-        public static void HideTopView(Action onFinishTransition = null, bool immediate = false)
+        public static void HideTopView(bool release = false)
         {
-            Instance._Hide(Instance.CurrentView, onFinishTransition, immediate);
+            Instance._Hide(Instance.CurrentView, release);
         }
 
-        public static void Hide(BaseView view, Action onFinishTransition = null, bool immediate = false)
+        public static void Hide(BaseView view, bool release = false)
         {
-            Instance._Hide(view, onFinishTransition, immediate);
+            Instance._Hide(view, release);
         }
 
-        public static void Hide<T>(Action onFinishTransition = null, bool immediate = false) where T : BaseView
+        public static void Hide<T>(bool release = false) where T : BaseView
         {
             var viewName = typeof(T).Name;
 
             if (Instance._instantiatedViews.TryGetValue(viewName, out var baseView))
             {
-                Instance._Hide(baseView, onFinishTransition, immediate);
+                Instance._Hide(baseView, release);
             }
         }
 
-        private void _Hide(BaseView view, Action onFinishTransition, bool immediate = false)
+        private void _Hide(BaseView view, bool release = false)
         {
+            var viewName = view.GetType().Name;
             if (view == null)
             {
-                Debug.LogError($"[ViewManager] {view.name} is null");
+                Debug.LogError($"[ViewManager] {viewName} is null");
                 return;
             };
             if (_views.Count < 2)
             {
-                Debug.LogError($"[ViewManager] Current view count is less than 2, cannot hide " + view.GetType().Name);
+                Debug.LogError($"[ViewManager] Current view count is less than 2, cannot hide " + viewName);
                 return;
             }
 
@@ -250,33 +252,28 @@ namespace Floof
             {
                 view.OnHide();
 
-                if (!immediate)
-                {
-                    SetInteractable(false);
-                    yield return YieldCollection.WaitForSeconds(view.TransitionOutDuration);
-                    SetInteractable(true);
-                }
+                SetInteractable(false);
+                yield return YieldCollection.WaitForSeconds(view.TransitionOutDuration);
+                SetInteractable(true);
 
                 if (view.DestroyOnHide)
                 {
                     Destroy(view.gameObject);
-                    _instantiatedViews.Remove(view.GetType().Name);
+                    _instantiatedViews.Remove(viewName);
                 }
                 else
                 {
                     view.gameObject.SetActive(false);
                 }
-                onFinishTransition?.Invoke();
+
+                if (release)
+                {
+                    AssetManager.PrefabLoader.UnloadAsset(_nameToAddressMap[viewName]);
+                }
             }
         }
 
-        private PrefabReference GetPrefabRef(string viewName)
-        {
-            var assetRef = new PrefabReference(_nameToAddressMap[viewName]);
-            return assetRef;
-        }
-
-        private async UniTask<BaseView> GetView(string viewName, string extraPath = null)
+        private async UniTask<BaseView> GetView(string viewName)
         {
             if (_instantiatedViews == null) return null;
 
@@ -287,7 +284,7 @@ namespace Floof
 
             try
             {
-                var resource = await AssetManager.PrefabLoader.LoadAssetAsync(GetPrefabRef(viewName));
+                var resource = await AssetManager.PrefabLoader.LoadAssetAsync(_nameToAddressMap[viewName]);
                 baseView = Instantiate(resource, _viewLayer).GetComponent<BaseView>();
             }
             catch (Exception ex)
