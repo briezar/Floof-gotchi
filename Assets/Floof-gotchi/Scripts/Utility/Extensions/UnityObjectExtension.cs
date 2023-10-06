@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace SpecializedExtension
 {
@@ -154,11 +155,11 @@ public static class ObjectExtension
     public static void DestroyGameObject(this GameObject gameObject)
     {
         if (gameObject == null) { return; }
-        GameObject.Destroy(gameObject);
-        gameObject = null;
+        Object.Destroy(gameObject);
     }
     public static void DestroyGameObject(this Component component)
     {
+        if (component == null) { return; }
         DestroyGameObject(component.gameObject);
     }
 

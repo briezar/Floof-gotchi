@@ -8,13 +8,7 @@ namespace Floof
 {
     public abstract class BaseView : MonoBehaviour
     {
-        [field: SerializeField] public bool IsPopup { get; private set; }
         [field: SerializeField] public bool DestroyOnHide { get; private set; }
-
-        [ShowIf(nameof(IsPopup))]
-        [SerializeField] private ShowPopupBehaviour _showPopupBehaviour = ShowPopupBehaviour.HideLowerPopup;
-
-        public ShowPopupBehaviour ShowPopupBehaviour => _showPopupBehaviour;
 
         private CanvasGroup _cacheCanvasGroup;
         public CanvasGroup canvasGroup => _cacheCanvasGroup ??= this.ForceGetComponent<CanvasGroup>();

@@ -6,13 +6,12 @@ namespace Floof
 {
     public class FloofController
     {
-        private float _happiness, _hunger, _hygiene, _sleep;
-        public FloofView Floof { get; private set; }
+        public FloofEntity Floof { get; private set; }
+        private FloofStateMachine _floofStateMachine;
 
-        public FloofController(FloofView floofView)
+        public FloofController(FloofEntity floof)
         {
-            Floof = floofView;
-            // Floof.StartWandering();
+            Floof = floof;
         }
 
         public void ResetFloof()

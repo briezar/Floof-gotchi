@@ -2,32 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.RectTransform;
 
 namespace Floof
 {
     public class CameraFollow : MonoBehaviour
     {
-        [SerializeField] private Transform _target;
-        [SerializeField] private RectTransform _bound;
-        [SerializeField] public bool FollowHorizontal;
-        [SerializeField] public bool FollowVertical;
+        [field: SerializeField] public bool FollowHorizontal { get; private set; }
+        [field: SerializeField] public bool FollowVertical { get; private set; }
+
+        private Transform _target;
 
         private Vector3[] _boundCorners;
-        private Vector3 _minBound, _maxBound;
+
+        private Vector3 _minBound => _boundCorners[0];
+        private Vector3 _maxBound => _boundCorners[2];
         private Vector3 _minPoint => _cam.ViewportToWorldPoint(Vector3.zero);
         private Vector3 _maxPoint => _cam.ViewportToWorldPoint(Vector3.one);
 
         private Camera _cam => ViewManager.Instance.UICamera;
-        private enum Axis
-        {
-            Horizontal,
-            Vertical
-        }
-
-        private void Awake()
-        {
-            UpdateBounds();
-        }
 
         public void SetTarget(Transform target)
         {
@@ -37,8 +30,14 @@ namespace Floof
 
         public void SetBounds(RectTransform bound)
         {
-            _bound = bound;
-            UpdateBounds();
+            _boundCorners = bound.GetWorldCorners();
+        }
+
+        public void SetBounds(Vector3 minPos, Vector3 maxPos)
+        {
+            _boundCorners = new Vector3[4];
+            _boundCorners[0] = minPos;
+            _boundCorners[2] = maxPos;
         }
 
         private void Update()
@@ -51,16 +50,9 @@ namespace Floof
             FollowTarget();
         }
 
-        private void UpdateBounds()
-        {
-            if (_bound == null) { return; }
-            _minBound = _bound.TransformPoint(_bound.rect.min);
-            _maxBound = _bound.TransformPoint(_bound.rect.max);
-        }
-
         private void FollowTarget()
         {
-            if (_bound == null)
+            if (_boundCorners == null)
             {
                 _cam.transform.position = _target.position;
                 return;

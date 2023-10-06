@@ -6,12 +6,6 @@ using UnityEngine;
 
 namespace Floof
 {
-    public enum GameScene
-    {
-        LivingRoom,
-        BathRoom
-    }
-
     public class GameManager : MonoBehaviour
     {
         [SerializeField] private ViewManager _viewManager;
@@ -23,19 +17,22 @@ namespace Floof
 
         private void Awake()
         {
+            DOTween.Init();
+
+            Debug.unityLogger.logEnabled = false;
+#if UNITY_EDITOR
+            Debug.unityLogger.logEnabled = true;
+#endif
+            Application.targetFrameRate = 60;
+            Input.multiTouchEnabled = false;
+
             (_viewManager as IConstructable).Construct();
             (_audioManager as IConstructable).Construct();
         }
 
-        private IEnumerator Start()
+        private void Start()
         {
-            _stateMachine = new GameFlowStateMachine();
-
-            while (true)
-            {
-                yield return null;
-                _stateMachine.StateUpdate();
-            }
+            _stateMachine = new GameFlowStateMachine(this);
         }
 
     }

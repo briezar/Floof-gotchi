@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Floof.GameFlowStates
@@ -9,65 +10,59 @@ namespace Floof.GameFlowStates
     {
         public InitState(StateMachine stateMachine) : base(stateMachine) { }
 
-        private IState _mainMenuState;
+        private PlayState _playState;
 
-        public void AddStatesToTransit(MainMenuState mainMenuState)
+        private LoadingView _loadingView;
+        private bool _finishedLoading;
+
+        public void AddStatesToTransit(PlayState playState)
         {
-            _mainMenuState = mainMenuState;
+            _playState = playState;
         }
 
-        public override void OnEnter()
+        protected override async void OnEnter()
         {
-            DG.Tweening.DOTween.Init();
+            PreloadViews();
 
-            Debug.unityLogger.logEnabled = false;
-#if UNITY_EDITOR
-            Debug.unityLogger.logEnabled = true;
-#endif
-            Application.targetFrameRate = 60;
-            Input.multiTouchEnabled = false;
+            var fadeSetting = FadeSetting.FadeOut(0.5f);
 
-            var loadingView = ViewManager.Show<LoadingView>();
-            // StartCoroutine(InitRoutine(loadUI));
+            ViewManager.FadeTransition(fadeSetting);
 
-            // IEnumerator InitRoutine(LoadUI loadUI)
-            // {
-            //     loadUI.Fill = 0f;
-            //     float maxFill = 0f;
-            //     UIManager.Instance.PreLoadUIs((percent) =>
-            //     {
-            //         maxFill = percent;
-            //     });
+            _loadingView = await ViewManager.ShowAsync<LoadingView>();
 
-            //     yield return loadUI.canvasGroup.DOFade(1f, 0.75f).ChangeStartValue(0f).SetDelay(0.25f).WaitForCompletion();
+            _loadingView.Fill = 0;
 
-            //     while (loadUI.Fill < 0.99f)
-            //     {
-            //         if (loadUI.Fill < maxFill)
-            //         {
-            //             loadUI.Fill += Time.deltaTime;
-            //         }
-            //         yield return null;
-            //     }
-            //     loadUI.Fill = 1f;
+            await UniTask.WaitForSeconds(0.75f);
 
-            //     var sequence = DOTween.Sequence()
-            //     .AppendCallback(() => new ClassicGame.MainController())
-            //     .AppendInterval(0.25f)
-            //     .Append(loadUI.canvasGroup.DOFade(0f, 0.75f));
+            var elapsedTime = 0f;
+            var minWaitTime = 1f;
+            var max = 0.8f;
 
-            //     yield return sequence.WaitForCompletion();
+            while (!_finishedLoading)
+            {
+                elapsedTime += Time.deltaTime;
+                _loadingView.Fill = Mathf.Lerp(0f, max, elapsedTime / minWaitTime);
+                if (elapsedTime > minWaitTime) { _finishedLoading = true; }
+                await UniTask.NextFrame();
+            }
 
-            //     UIManager.SetInteractable(true);
-            //     UIManager.ReleaseUI(loadUI);
-            // }
+            while (_loadingView.Fill < 1)
+            {
+                _loadingView.Fill += Time.deltaTime;
+                await UniTask.NextFrame();
+            }
 
+            fadeSetting = new FadeSetting(0.5f, 0.5f);
+            fadeSetting.OnFadeInComplete = () => ChangeState(_playState);
+
+            ViewManager.FadeTransition(fadeSetting);
         }
 
-        public override void OnUpdate()
+        private void PreloadViews()
         {
-
+            AssetManager.PrefabLoader.PreloadAssetAsync(ViewManager.GetPrefabReference<PlayView>());
         }
 
     }
+
 }

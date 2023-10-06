@@ -631,7 +631,7 @@ GameObject:
   - component: {fileID: 8500278151259901546}
   - component: {fileID: 1437644468722944365}
   m_Layer: 5
-  m_Name: ConfirmPopup
+  m_Name: MessagePopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

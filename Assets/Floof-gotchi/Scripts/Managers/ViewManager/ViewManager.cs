@@ -14,6 +14,7 @@ namespace Floof
     {
         [field: SerializeField] public Camera UICamera { get; private set; }
         [field: SerializeField] public EventSystem EventSystem { get; private set; }
+        [field: SerializeField] public Transform WorldCanvas { get; private set; }
 
         [SerializeField] private UnityEngine.AddressableAssets.AssetLabelReference _viewLabel;
         [SerializeField] private Transform _viewLayer;
@@ -150,14 +151,21 @@ namespace Floof
             Instance._animation.EnableLoading(enable, text);
         }
 
-        public async static UniTask<T> Show<T>() where T : BaseView
+        public static T Show<T>() where T : BaseView
         {
-            return await Instance._Show(typeof(T).Name) as T;
+            return Instance.InternalShow<T>().GetAwaiter().GetResult();
         }
 
-        private async UniTask<BaseView> _Show(string viewName)
+        public async static UniTask<T> ShowAsync<T>() where T : BaseView
         {
-            var view = await GetView(viewName);
+            return await Instance.InternalShow<T>();
+        }
+
+        private async UniTask<T> InternalShow<T>() where T : BaseView
+        {
+            var viewName = typeof(T).Name;
+
+            var view = await GetView<T>();
             if (view == null)
             {
                 Debug.LogError("View prefab not found " + viewName);
@@ -166,7 +174,7 @@ namespace Floof
 
             if (view == CurrentView)
             {
-                Debug.LogWarning($"You're trying to show the current view again! [{view.name}]");
+                Debug.LogWarning($"You're trying to show the current view again! [{viewName}]");
                 return view;
             }
 
@@ -175,19 +183,20 @@ namespace Floof
             view.transform.SetAsLastSibling();
             view.OnShow();
 
-            if (view.IsPopup)
+            if (view is PopupView)
             {
-                switch (view.ShowPopupBehaviour)
+                var popupView = view as PopupView;
+                switch (popupView.ShowPopupBehaviour)
                 {
                     case ShowPopupBehaviour.HideLowerPopup:
-                        if (PreviousView.IsPopup)
+                        if (PreviousView is PopupView)
                         {
                             Hide(PreviousView);
                         }
                         break;
                 }
 
-                if (view.ShowPopupBehaviour != ShowPopupBehaviour.DoNothing)
+                if (popupView.ShowPopupBehaviour != ShowPopupBehaviour.DoNothing)
                 {
                     _animation.ShowPopupBackgroundDim(DefaultTransitionDuration);
                 }
@@ -206,14 +215,43 @@ namespace Floof
             }
         }
 
+        private async UniTask<T> GetView<T>() where T : BaseView
+        {
+            var viewName = typeof(T).Name;
+
+            if (_instantiatedViews == null) return null;
+
+            if (_instantiatedViews.TryGetValue(viewName, out var view))
+            {
+                return view as T;
+            }
+
+            try
+            {
+                var resource = await AssetManager.PrefabLoader.LoadAssetAsync(GetPrefabReference<T>());
+                view = Instantiate(resource, _viewLayer).GetComponent<BaseView>();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+                return null;
+            }
+
+            view.OnInstantiate();
+
+            _instantiatedViews.Add(viewName, view);
+
+            return view as T;
+        }
+
         public static void HideTopView(bool release = false)
         {
-            Instance._Hide(Instance.CurrentView, release);
+            Instance.InternalHide(Instance.CurrentView, release);
         }
 
         public static void Hide(BaseView view, bool release = false)
         {
-            Instance._Hide(view, release);
+            Instance.InternalHide(view, release);
         }
 
         public static void Hide<T>(bool release = false) where T : BaseView
@@ -222,11 +260,11 @@ namespace Floof
 
             if (Instance._instantiatedViews.TryGetValue(viewName, out var baseView))
             {
-                Instance._Hide(baseView, release);
+                Instance.InternalHide(baseView, release);
             }
         }
 
-        private void _Hide(BaseView view, bool release = false)
+        private void InternalHide(BaseView view, bool release = false)
         {
             var viewName = view.GetType().Name;
             if (view == null)
@@ -242,7 +280,7 @@ namespace Floof
 
             _views.Remove(view);
 
-            var noMorePopups = !_views.Exists(match => match.IsPopup);
+            var noMorePopups = !_views.Exists(match => match is PopupView);
             if (noMorePopups) { _animation.HidePopupBackgroundDim(DefaultTransitionDuration); }
 
             StartCoroutine(TransitionOutRoutine());
@@ -273,33 +311,10 @@ namespace Floof
             }
         }
 
-        private async UniTask<BaseView> GetView(string viewName)
+        public static PrefabReference GetPrefabReference<T>() where T : BaseView
         {
-            if (_instantiatedViews == null) return null;
-
-            if (_instantiatedViews.TryGetValue(viewName, out var baseView))
-            {
-                return baseView;
-            }
-
-            try
-            {
-                var resource = await AssetManager.PrefabLoader.LoadAssetAsync(_nameToAddressMap[viewName]);
-                baseView = Instantiate(resource, _viewLayer).GetComponent<BaseView>();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex);
-                return null;
-            }
-
-            baseView.OnInstantiate();
-
-            _instantiatedViews.Add(viewName, baseView);
-
-            return baseView;
+            return Instance._nameToAddressMap[typeof(T).Name];
         }
-
 
     }
 }

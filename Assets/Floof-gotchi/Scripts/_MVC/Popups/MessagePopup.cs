@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Floof
 {
-    public class ConfirmPopup : BaseView
+    public class MessagePopup : PopupView
     {
         public override void OnBack()
         {

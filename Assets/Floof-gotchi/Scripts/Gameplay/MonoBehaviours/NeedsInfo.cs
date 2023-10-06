@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NeedsIcon : MonoBehaviour
+public class NeedsInfo : MonoBehaviour
 {
     [SerializeField] private Image _foregroundImg;
 

@@ -7,12 +7,11 @@ using Random = UnityEngine.Random;
 
 namespace Floof
 {
-    public class FloofView : MonoBehaviour
+    public class FloofEntity : MonoBehaviour
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private float _speed;
 
-        private RectTransform _moveSpace;
         private Vector3[] _moveSpaceCorners;
 
         private Coroutine _wanderRoutine;
@@ -20,9 +19,8 @@ namespace Floof
 
         public void Setup(RectTransform moveSpace)
         {
-            _moveSpace = moveSpace;
             transform.position = moveSpace.position;
-            UpdateWorldCorners();
+            _moveSpaceCorners = moveSpace.GetWorldCorners();
         }
 
         public void StartWandering(float delay = 0)
@@ -46,7 +44,7 @@ namespace Floof
             bool isFacingRight = transform.position.x < destination.x;
             transform.localScale = new Vector3(isFacingRight ? 1 : -1, transform.localScale.y);
 
-            _moveTween = transform.DOMove(destination, _speed).SetSpeedBased()
+            _moveTween = transform.DOMove(destination, _speed).SetSpeedBased().SetEase(Ease.Linear)
             .OnComplete(() =>
             {
                 _animator.Play(Anim.FloofIdle);
@@ -58,11 +56,6 @@ namespace Floof
         {
             if (_wanderRoutine != null) { StopCoroutine(_wanderRoutine); }
             _moveTween.Complete();
-        }
-
-        private void UpdateWorldCorners()
-        {
-            _moveSpaceCorners = _moveSpace.GetWorldCorners();
         }
 
         private Vector2 GetRandomPos()

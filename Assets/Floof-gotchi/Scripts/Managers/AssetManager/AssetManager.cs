@@ -28,6 +28,12 @@ namespace Floof
 
             return keys;
         }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init()
+        {
+            Addressables.InitializeAsync();
+        }
     }
 
 

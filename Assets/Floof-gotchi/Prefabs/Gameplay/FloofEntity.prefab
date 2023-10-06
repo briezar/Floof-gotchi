@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3974445144649738197}
   - component: {fileID: 1942005394157302716}
   m_Layer: 5
-  m_Name: FloofView
+  m_Name: FloofEntity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
