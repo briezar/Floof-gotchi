@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 
 namespace Floof
@@ -11,12 +12,16 @@ namespace Floof
         [SerializeField] private ViewManager _viewManager;
         [SerializeField] private AudioManager _audioManager;
 
+        public static Transform GameContainer => _instance.transform;
+
+        private static GameManager _instance;
 
         private GameFlowStateMachine _stateMachine;
 
 
         private void Awake()
         {
+            _instance = this;
             DOTween.Init();
 
             Debug.unityLogger.logEnabled = false;

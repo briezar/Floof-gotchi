@@ -11,26 +11,21 @@ namespace Floof
 {
     public static class AssetManagerExtension
     {
-        public static bool TryGetComponent<T>(this IAssetsReferenceLoader<GameObject> assetsLoader, PrefabReference prefabReference, out T component) where T : Component
+        public static T GetComponent<T>(this IAssetsReferenceLoader<GameObject> assetsLoader, PrefabReference prefabReference) where T : Component
         {
+            T component = null;
             if (assetsLoader.TryGetAsset(prefabReference, out var gameObject))
             {
-                return gameObject.TryGetComponent(out component);
+                gameObject.TryGetComponent<T>(out component);
+                return component;
             }
 
-            component = null;
-            return false;
+            return component;
         }
 
-        public static bool TryGetComponent<T>(this IAssetsReferenceLoader<GameObject> assetsLoader, PrefabReference<T> prefabReference, out T component) where T : Component
+        public static T GetComponent<T>(this IAssetsReferenceLoader<GameObject> assetsLoader, PrefabReference<T> prefabReference) where T : Component
         {
-            if (assetsLoader.TryGetAsset(prefabReference, out var gameObject))
-            {
-                return gameObject.TryGetComponent(out component);
-            }
-
-            component = null;
-            return false;
+            return GetComponent<T>(assetsLoader, prefabReference);
         }
 
         public static UniTask PreloadAssetsAsync<TKey, TAsset>(this IAssetsLoader<TKey, TAsset> assetsLoader, params TKey[] keys) where TAsset : Object
@@ -54,6 +49,20 @@ namespace Floof
             {
                 assetsLoader.UnloadAsset(key);
             }
+        }
+
+        public static UniTask<TAsset> LoadAssetAsync<TAsset>(this IAssetsReferenceLoader<TAsset> assetsLoader, Address address) where TAsset : Object
+        {
+            string key;
+            if (address.Keys.Count > 1)
+            {
+                key = AssetManager.GetLocations(address, typeof(TAsset))[0].PrimaryKey;
+            }
+            else
+            {
+                key = (string)address.Keys[0];
+            }
+            return assetsLoader.LoadAssetAsync(new AssetReferenceT<TAsset>(key));
         }
 
         public static UniTask<TAsset[]> LoadAssetsAsync<TKey, TAsset>(this IAssetsLoader<TKey, TAsset> assetsLoader, params TKey[] keys) where TAsset : Object

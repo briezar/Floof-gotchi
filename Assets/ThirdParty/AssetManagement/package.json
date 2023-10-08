@@ -1,0 +1,18 @@
+{
+  "name": "com.dre0dru.assetmanagement",
+  "version": "7.1.1",
+  "displayName": "Asset Management",
+  "description": "Strongly typed Addressables services for async/await workflow using UniTask:\n - Assets Loaders\n - Assets Donwloaders",
+  "keywords": [
+    "Unity"
+  ],
+  "author": {
+    "name": "Dre0Dru",
+    "url": "https://github.com/dre0dru"
+  },
+  "license": "MIT",
+  "documentationUrl": "https://github.com/dre0dru",
+  "changelogUrl": "https://github.com/dre0dru",
+  "licensesUrl": "https://github.com/dre0dru",
+  "type": "library"
+}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Dre0Dru.AddressableAssets.Loaders;
 using UnityEngine;
 
 namespace Floof
@@ -14,12 +15,21 @@ namespace Floof
 
         private List<PrefabReference> _allReferences;
 
-        private void OnEnable()
+        private void SetReferences()
         {
-            if (!Application.isPlaying) { return; }
-
             _allReferences = new() { _gamePresenterRef, _floofPresenterRef };
             _allReferences.AddRange(_scenesPrefabRef);
+        }
+
+        public async UniTask LoadAll()
+        {
+            SetReferences();
+            await AssetManager.PrefabLoader.LoadAssetsAsync(_allReferences);
+        }
+
+        public void UnloadAll()
+        {
+            AssetManager.PrefabLoader.UnloadAssets(_allReferences);
         }
 
         public ClassicGamePresenter GetClassicGamePresenter()
@@ -37,14 +47,5 @@ namespace Floof
             return _scenesPrefabRef[(int)gameSceneType].Component;
         }
 
-        public async UniTask LoadAll()
-        {
-            await AssetManager.PrefabLoader.LoadAssetsAsync(_allReferences);
-        }
-
-        public void UnloadAll()
-        {
-            AssetManager.PrefabLoader.UnloadAssets(_allReferences);
-        }
     }
 }

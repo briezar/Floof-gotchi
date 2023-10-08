@@ -13,13 +13,15 @@ namespace Floof
         public void Setup(PlayView playView, FloofPresenter floof)
         {
             _playView = playView;
-            playView.GoToScene(GameSceneType.LivingRoom);
-
             _floof = floof;
+
+            playView.SetCameraTarget(floof.transform);
+            playView.GoToScene(GameSceneType.LivingRoom);
 
             floof.transform.SetParent(transform);
             floof.Setup(_playView.CurrentScene.MoveSpace);
             floof.StartWandering(2f);
+
         }
     }
 }

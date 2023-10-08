@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3095767239062814405}
   - component: {fileID: 3095767239062814426}
-  m_Layer: 0
+  - component: {fileID: 106428412574761730}
+  m_Layer: 5
   m_Name: ClassicGamePresenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,4 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0d4b874623b28840bdb2d533644f66b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _floofPrefab: {fileID: 0}
+--- !u!210 &106428412574761730
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3095767239062814404}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0

@@ -7,14 +7,12 @@ namespace Floof
 {
     public class PlayView : BaseView
     {
-        [SerializeField] private FloofPresenter _floofPrefab;
         [SerializeField] private Scene[] _scenePrefabs;
         [SerializeField] private Transform _bottomBar;
         [SerializeField] private CameraFollow _camFollow;
 
         public Scene CurrentScene { get; private set; }
         private Dictionary<NeedsType, NeedsInfo> _needs;
-        private FloofPresenter _floof;
 
         public override void OnInstantiate()
         {
@@ -25,10 +23,11 @@ namespace Floof
             {
                 _needs.Add((NeedsType)i, allNeeds[i]);
             }
+        }
 
-            _floof = Instantiate(_floofPrefab);
-
-            _camFollow.SetTarget(_floof.transform);
+        public void SetCameraTarget(Transform floofTransform)
+        {
+            _camFollow.SetTarget(floofTransform);
         }
 
         public NeedsInfo GetNeeds(NeedsType needsType)

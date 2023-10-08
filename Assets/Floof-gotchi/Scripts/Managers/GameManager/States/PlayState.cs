@@ -2,9 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Dre0Dru.AddressableAssets.Loaders;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace Floof.GameFlowStates
 {
@@ -12,30 +10,50 @@ namespace Floof.GameFlowStates
     {
         public PlayState(StateMachine stateMachine) : base(stateMachine) { }
 
-        private ScriptableObjectReference<ClassicGameAsset> _classicGameAssetRef;
+        private ClassicGameAsset _classicGameAsset;
+        private bool _isPreloading;
+
+        public async UniTask Preload()
+        {
+            if (_isPreloading)
+            {
+                await UniTask.WaitUntil(() => !_isPreloading);
+                return;
+            }
+
+            _isPreloading = true;
+
+            var viewTask = ViewManager.Preload<PlayView>();
+
+            var address = new Address(nameof(ClassicGameAsset), nameof(ScriptableObject));
+
+            _classicGameAsset = await AssetManager.ScriptableObjectLoader.LoadAssetAsync(address) as ClassicGameAsset;
+
+            await _classicGameAsset.LoadAll();
+
+            await viewTask;
+
+            _isPreloading = false;
+        }
 
         protected override async void OnEnter()
         {
-            var playViewRef = ViewManager.GetPrefabReference<PlayView>();
-            var viewTask = AssetManager.PrefabLoader.LoadAssetAsync(playViewRef);
-
-            var gameAsset = await Addressables.LoadAssetAsync<ClassicGameAsset>(nameof(ClassicGameAsset)).ToUniTask();
-
-            await gameAsset.LoadAll();
-            await viewTask;
+            await Preload();
 
             var fadeSetting = new FadeSetting(0.5f, 0.5f);
+            fadeSetting.OnFadeInComplete = () =>
+            {
+                var playView = ViewManager.Show<PlayView>();
+                ViewManager.Hide<LoadingView>(true);
+
+                var gamePresenter = GameObject.Instantiate(_classicGameAsset.GetClassicGamePresenter(), GameManager.GameContainer);
+                var floofPresenter = GameObject.Instantiate(_classicGameAsset.GetFloofPresenter());
+
+                gamePresenter.Setup(playView, floofPresenter);
+            };
+
             ViewManager.FadeTransition(fadeSetting);
 
-            var playView = ViewManager.Show<PlayView>();
-            ViewManager.Hide<LoadingView>();
-
-            var gamePresenter = GameObject.Instantiate(gameAsset.GetClassicGamePresenter());
-            var floofPresenter = GameObject.Instantiate(gameAsset.GetFloofPresenter());
-
-            gamePresenter.Setup(playView, floofPresenter);
-
-            // _gamePresenter = new ClassicGamePresenter(playView);
         }
 
     }

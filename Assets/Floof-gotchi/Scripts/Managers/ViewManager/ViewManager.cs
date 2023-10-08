@@ -62,9 +62,10 @@ namespace Floof
 
 
             _nameToAddressMap = new();
-            var keys = AssetManager.GetKeys(new Address(_viewLabel));
-            foreach (var key in keys)
+            var locations = AssetManager.GetLocations(new Address(_viewLabel));
+            foreach (var location in locations)
             {
+                var key = location.PrimaryKey;
                 var startIndex = key.LastIndexOf('/') + 1;
                 var viewName = key.Substring(startIndex).Replace(".prefab", "");
                 var assetRef = new PrefabReference(key);
@@ -153,7 +154,7 @@ namespace Floof
 
         public static T Show<T>() where T : BaseView
         {
-            return Instance.InternalShow<T>().AsTask().GetAwaiter().GetResult();
+            return ShowAsync<T>().GetAwaiter().GetResult();
         }
 
         public async static UniTask<T> ShowAsync<T>() where T : BaseView
@@ -254,12 +255,13 @@ namespace Floof
             Instance.InternalHide(view, release);
         }
 
-        public static void Hide<T>(bool release = false) where T : BaseView
+        public static void Hide<T>(bool immediate = false, bool release = false) where T : BaseView
         {
             var viewName = typeof(T).Name;
 
             if (Instance._instantiatedViews.TryGetValue(viewName, out var baseView))
             {
+                if (immediate) { baseView.gameObject.SetActive(false); }
                 Instance.InternalHide(baseView, release);
             }
         }
@@ -307,6 +309,11 @@ namespace Floof
                 }
 
             }
+        }
+
+        public static async UniTask Preload<T>() where T : BaseView
+        {
+            await AssetManager.PrefabLoader.LoadAssetAsync(GetPrefabReference<T>());
         }
 
         public static PrefabReference GetPrefabReference<T>() where T : BaseView

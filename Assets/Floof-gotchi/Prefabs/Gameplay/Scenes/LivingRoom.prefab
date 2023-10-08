@@ -98,9 +98,9 @@ SortingGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3630548025504160348}
   m_Enabled: 1
-  m_SortingLayerID: -1703296977
-  m_SortingLayer: 1
-  m_SortingOrder: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: -1
 --- !u!1 &8908770654404950419
 GameObject:
   m_ObjectHideFlags: 0

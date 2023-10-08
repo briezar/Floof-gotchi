@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Dre0Dru.AddressableAssets.Loaders;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using Object = UnityEngine.Object;
 
 namespace Floof
@@ -11,22 +14,15 @@ namespace Floof
     public class AssetManager
     {
         public static readonly IAssetsReferenceLoader<GameObject> PrefabLoader = new AssetsReferenceLoader<GameObject>();
+        public static readonly IAssetsReferenceLoader<ScriptableObject> ScriptableObjectLoader = new AssetsReferenceLoader<ScriptableObject>();
 
-        public static List<string> GetKeys(Address address)
+        public static IList<IResourceLocation> GetLocations(Address address, Type type = null)
         {
-            var locationHandle = Addressables.LoadResourceLocationsAsync(address.Keys, Addressables.MergeMode.Union, typeof(GameObject));
-            locationHandle.WaitForCompletion();
-            var locations = locationHandle.Result;
-
-            var keys = new List<string>();
-
-            foreach (var location in locations)
-            {
-                keys.Add(location.PrimaryKey);
-            }
+            var locationHandle = Addressables.LoadResourceLocationsAsync(address.Keys, Addressables.MergeMode.Intersection, type);
+            var locations = locationHandle.WaitForCompletion();
             Addressables.Release(locationHandle);
 
-            return keys;
+            return locations;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -49,7 +45,8 @@ namespace Floof
     {
         public PrefabReference(string guid) : base(guid) { }
 
-        public T Component => Asset as T;
+
+        public T Component => (Asset as GameObject).GetComponent<T>();
     }
 
     [Serializable]

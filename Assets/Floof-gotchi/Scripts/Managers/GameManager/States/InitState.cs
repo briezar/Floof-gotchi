@@ -22,17 +22,11 @@ namespace Floof.GameFlowStates
 
         protected override async void OnEnter()
         {
-            var loadingViewRef = ViewManager.GetPrefabReference<LoadingView>();
-
-            var preloadTask = AssetManager.PrefabLoader.PreloadAssetsAsync(loadingViewRef);
+            _loadingView = await ViewManager.ShowAsync<LoadingView>();
+            _playState.Preload().Forget();
 
             var fadeSetting = FadeSetting.FadeOut(0.5f);
-
-            await UniTask.WaitUntil(() => AssetManager.PrefabLoader.IsAssetLoaded(loadingViewRef));
-
             ViewManager.FadeTransition(fadeSetting);
-
-            _loadingView = ViewManager.Show<LoadingView>();
 
             _loadingView.Fill = 0;
 
@@ -57,8 +51,6 @@ namespace Floof.GameFlowStates
             }
 
             _loadingView.SetText("Complete!");
-
-            await UniTask.WaitForSeconds(0.25f);
 
             ChangeState(_playState);
         }
