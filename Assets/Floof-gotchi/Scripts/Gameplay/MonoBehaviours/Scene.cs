@@ -11,18 +11,14 @@ namespace Floof
     {
         [field: SerializeField] public RectTransform MoveSpace { get; private set; }
         [SerializeField] private SpriteRenderer _bgSpriteRenderer;
-        [SerializeField] private CameraFollow _camFollow;
 
-        public void Setup(Transform floofTransform)
+        private SpriteStretchFillScreen _spriteStretchFillScreen;
+
+        public Bounds GetBounds()
         {
-            _bgSpriteRenderer.GetComponent<SpriteStretchFillScreen>().Stretch();
-            _camFollow.SetTarget(floofTransform);
-
-            var minPos = _bgSpriteRenderer.bounds.min;
-            var maxPos = _bgSpriteRenderer.bounds.max;
-            _camFollow.SetBounds(minPos, maxPos);
+            _spriteStretchFillScreen ??= _bgSpriteRenderer.GetComponent<SpriteStretchFillScreen>();
+            _spriteStretchFillScreen.Stretch();
+            return _bgSpriteRenderer.bounds;
         }
-
-
     }
 }

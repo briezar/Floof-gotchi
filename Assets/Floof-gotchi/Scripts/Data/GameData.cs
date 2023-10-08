@@ -5,6 +5,6 @@ using UnityEngine;
 
 namespace Floof
 {
-    public enum Needs { Happiness, Hunger, Hygiene, Sleep }
-    public enum GameScene { LivingRoom, BathRoom }
+    public enum NeedsType { Happiness, Hunger, Hygiene, Sleep }
+    public enum GameSceneType { LivingRoom, BathRoom }
 }

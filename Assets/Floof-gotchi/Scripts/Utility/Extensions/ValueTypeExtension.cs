@@ -55,6 +55,10 @@ public static class ValueTypeExtension
     {
         return Mathf.Clamp(value, min, value);
     }
+    public static float ClampMax(this float value, float max)
+    {
+        return Mathf.Clamp(value, value, max);
+    }
 
     public static Vector3 Shift(this Vector3 vector, float x, float y = 0, float z = 0)
     {

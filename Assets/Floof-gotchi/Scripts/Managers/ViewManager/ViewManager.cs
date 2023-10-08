@@ -62,7 +62,7 @@ namespace Floof
 
 
             _nameToAddressMap = new();
-            var keys = AssetManager.GetKeys(_viewLabel);
+            var keys = AssetManager.GetKeys(new Address(_viewLabel));
             foreach (var key in keys)
             {
                 var startIndex = key.LastIndexOf('/') + 1;
@@ -153,7 +153,7 @@ namespace Floof
 
         public static T Show<T>() where T : BaseView
         {
-            return Instance.InternalShow<T>().GetAwaiter().GetResult();
+            return Instance.InternalShow<T>().AsTask().GetAwaiter().GetResult();
         }
 
         public async static UniTask<T> ShowAsync<T>() where T : BaseView
@@ -298,16 +298,14 @@ namespace Floof
                 {
                     Destroy(view.gameObject);
                     _instantiatedViews.Remove(viewName);
+
+                    if (release) { AssetManager.PrefabLoader.UnloadAsset(_nameToAddressMap[viewName]); }
                 }
                 else
                 {
                     view.gameObject.SetActive(false);
                 }
 
-                if (release)
-                {
-                    AssetManager.PrefabLoader.UnloadAsset(_nameToAddressMap[viewName]);
-                }
             }
         }
 

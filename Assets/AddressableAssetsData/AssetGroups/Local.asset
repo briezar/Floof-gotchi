@@ -16,19 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 647edb615ec0acc42811cca919629c16
-  m_SerializeEntries:
-  - m_GUID: b3fd8153dd54ccf4d8bf2ef3fc71ef97
-    m_Address: Data/SceneData.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 8b1bd3642799af74c94ee71c33ff8e54
-    m_Address: Assets/Floof-gotchi/Textures/living-room
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 517c4067e73777944b45fedc2bb6fb76
-    m_Address: Assets/Floof-gotchi/Textures/bathroom
-    m_ReadOnly: 0
-    m_SerializedLabels: []
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 54391f2a50e1dc043b87717b63195d43, type: 2}
   m_SchemaSet:

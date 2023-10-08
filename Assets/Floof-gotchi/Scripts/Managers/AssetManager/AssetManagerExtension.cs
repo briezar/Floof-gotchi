@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Dre0Dru.AddressableAssets.Loaders;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using UnityEngine.AddressableAssets;
 
 namespace Floof
 {
@@ -20,7 +21,7 @@ namespace Floof
             component = null;
             return false;
         }
-    
+
         public static bool TryGetComponent<T>(this IAssetsReferenceLoader<GameObject> assetsLoader, PrefabReference<T> prefabReference, out T component) where T : Component
         {
             if (assetsLoader.TryGetAsset(prefabReference, out var gameObject))

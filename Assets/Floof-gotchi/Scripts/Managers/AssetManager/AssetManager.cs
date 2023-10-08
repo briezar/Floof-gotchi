@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using Dre0Dru.AddressableAssets.Loaders;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Object = UnityEngine.Object;
 
 namespace Floof
 {
     public class AssetManager
     {
         public static readonly IAssetsReferenceLoader<GameObject> PrefabLoader = new AssetsReferenceLoader<GameObject>();
-        public static readonly IAssetsReferenceLoader<Sprite> SpriteLoader = new AssetsReferenceLoader<Sprite>();
 
-        public static List<string> GetKeys(params AssetLabelReference[] labelReferences)
+        public static List<string> GetKeys(Address address)
         {
-            var locationHandle = Addressables.LoadResourceLocationsAsync(labelReferences as IEnumerable, Addressables.MergeMode.Union, typeof(GameObject));
+            var locationHandle = Addressables.LoadResourceLocationsAsync(address.Keys, Addressables.MergeMode.Union, typeof(GameObject));
             locationHandle.WaitForCompletion();
             var locations = locationHandle.Result;
 
@@ -38,9 +38,18 @@ namespace Floof
 
 
     [Serializable]
-    public class PrefabReference<T> : AssetReferenceGameObject where T : Component
+    public class ScriptableObjectReference<T> : AssetReferenceT<ScriptableObject> where T : ScriptableObject
+    {
+        public ScriptableObjectReference(string guid) : base(guid) { }
+        public T Component => Asset as T;
+    }
+
+    [Serializable]
+    public class PrefabReference<T> : PrefabReference where T : Component
     {
         public PrefabReference(string guid) : base(guid) { }
+
+        public T Component => Asset as T;
     }
 
     [Serializable]

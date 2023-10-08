@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace Floof
 {
-    public class FloofEntity : MonoBehaviour
+    public class FloofPresenter : MonoBehaviour
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private float _speed;
@@ -44,10 +44,13 @@ namespace Floof
             bool isFacingRight = transform.position.x < destination.x;
             transform.localScale = new Vector3(isFacingRight ? 1 : -1, transform.localScale.y);
 
-            _moveTween = transform.DOMove(destination, _speed).SetSpeedBased().SetEase(Ease.Linear)
+            var distance = Vector3.Distance(transform.position, destination);
+            var moveTime = distance / _speed;
+
+            _moveTween = transform.DOMove(destination, moveTime.ClampMax(3)).SetEase(Ease.Linear)
             .OnComplete(() =>
             {
-                _animator.Play(Anim.FloofIdle);
+                _animator.Play(Anim.FloofIdle0);
             });
             return _moveTween.WaitForCompletion();
         }

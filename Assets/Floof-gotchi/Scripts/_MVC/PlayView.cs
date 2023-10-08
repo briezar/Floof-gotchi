@@ -7,30 +7,47 @@ namespace Floof
 {
     public class PlayView : BaseView
     {
-        [field: SerializeField] public FloofEntity Floof { get; private set; }
-
-        [SerializeField] private Transform _sceneHolder;
+        [SerializeField] private FloofPresenter _floofPrefab;
         [SerializeField] private Scene[] _scenePrefabs;
         [SerializeField] private Transform _bottomBar;
+        [SerializeField] private CameraFollow _camFollow;
 
         public Scene CurrentScene { get; private set; }
-        public Dictionary<Needs, NeedsInfo> Needs { get; private set; } = new();
+        private Dictionary<NeedsType, NeedsInfo> _needs;
+        private FloofPresenter _floof;
 
         public override void OnInstantiate()
         {
             var allNeeds = _bottomBar.GetComponentsInChildren<NeedsInfo>(true);
+
+            _needs = new();
             for (int i = 0; i < allNeeds.Length; i++)
             {
-                Needs.Add((Needs)i, allNeeds[i]);
+                _needs.Add((NeedsType)i, allNeeds[i]);
             }
+
+            _floof = Instantiate(_floofPrefab);
+
+            _camFollow.SetTarget(_floof.transform);
         }
 
-        public void GoToScene(GameScene gameScene)
+        public NeedsInfo GetNeeds(NeedsType needsType)
+        {
+            if (!_needs.TryGetValue(needsType, out var needsInfo))
+            {
+                Debug.LogWarning($"Invalid needs: {needsType}");
+            }
+            return needsInfo;
+        }
+
+        public void GoToScene(GameSceneType gameScene)
         {
             var index = (int)gameScene;
             CurrentScene.DestroyGameObject();
             CurrentScene = Instantiate(_scenePrefabs[index], ViewManager.Instance.WorldCanvas);
-            CurrentScene.Setup(Floof.transform);
+
+            var bounds = CurrentScene.GetBounds();
+            _camFollow.SetBounds(bounds.min, bounds.max);
         }
 
         public override void OnBack()
