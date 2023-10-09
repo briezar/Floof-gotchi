@@ -63,46 +63,6 @@ public static class GeneralUtils
         return deviceId;
     }
 
-    public static string GetIDFA()
-    {
-        switch (DeviceInfo.CurrentPlatform)
-        {
-            case Platform.IOS:
-                return Md5Sum(UnityEngine.iOS.Device.advertisingIdentifier).ToUpper();
-
-            case Platform.Android:
-                return Md5Sum(GetDeviceId()).ToUpper();
-        }
-        return "Unable to get IDFA";
-    }
-
-    private static string Md5Sum(string strToEncrypt)
-    {
-        var encoding = new UTF8Encoding();
-        var bytes = encoding.GetBytes(strToEncrypt);
-
-        var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-        var hashBytes = md5.ComputeHash(bytes);
-
-        var stringBuilder = new StringBuilder();
-        for (int i = 0; i < hashBytes.Length; i++)
-        {
-            var hash = System.Convert.ToString(hashBytes[i], 16).PadLeft(2, '0');
-            stringBuilder.Append(hash);
-        }
-
-        var hashString = stringBuilder.ToString();
-
-        return hashString.PadLeft(32, '0');
-    }
-
-    public static bool CheckOnScreen(Vector3 pos)
-    {
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(pos);
-        bool onScreen = screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
-        return onScreen;
-    }
-
     public static bool ValidatePIN(string PIN)
     {
         if (PIN.IsNullOrEmpty()) { return false; }
@@ -126,17 +86,6 @@ public static class GeneralUtils
     {
         var array = (T[])Enum.GetValues(typeof(T));
         return array;
-    }
-
-    public static bool ClickedInsideRect(RectTransform rectTransform, Camera cam = null)
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, Input.mousePosition, cam ?? Camera.main, out var localPoint);
-            return rectTransform.rect.Contains(localPoint);
-        }
-
-        return false;
     }
 
     /// <summary> Get a random index from an array of chances based on its values </summary>
@@ -188,6 +137,12 @@ public static class GeneralUtils
         var output = $"{methodName.Colorize(Color.yellow)} in {fileName.Colorize(Color.yellow)} at line {lineNumber.Colorize(Color.yellow)}";
 
         return output;
+    }
+
+    public static Color ColorFromInt(int r, int g, int b, int a = 255)
+    {
+        var color = new Color(r / 255f, g / 255f, b / 255f, a / 255f);
+        return color;
     }
 
 }

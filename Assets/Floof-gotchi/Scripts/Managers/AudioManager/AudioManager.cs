@@ -83,7 +83,6 @@ namespace Floof
         {
             if (_instance != null)
             {
-                Destroy(gameObject);
                 return;
             }
 

@@ -9,45 +9,44 @@ namespace Floof
 {
     public class SuperCellButton : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
-        private const float DURATION = 0.04f;
-        private const float SCALE_DOWN = 0.94f;
+        private const float DURATION = 0.05f;
+        private const float SCALE_DOWN = 0.9f;
         private Vector3 _originalScale;
 
         private bool _pressed = false;
-        private Graphic _graphic;
-        private Selectable _selectable;
-        private Coroutine _scaleRoutine;
+        private Button _button;
+
 
         private void Awake()
         {
-            _selectable = GetComponent<Selectable>();
-            _graphic = GetComponent<Graphic>();
+            _button = GetComponent<Button>();
             _originalScale = transform.localScale;
         }
 
         private void EnablePadding(bool enable)
         {
-            if (_graphic == null)
+            var graphic = _button.targetGraphic;
+            if (graphic == null)
             {
                 Debug.LogWarning(gameObject.name + " does not have graphic!");
                 return;
             }
             if (!enable)
             {
-                _graphic.raycastPadding = Vector4.zero;
+                graphic.raycastPadding = Vector4.zero;
                 return;
             }
 
-            var widthPadding = _graphic.rectTransform.rect.width * (1 - SCALE_DOWN);
-            var heightPadding = _graphic.rectTransform.rect.height * (1 - SCALE_DOWN);
+            var widthPadding = graphic.rectTransform.rect.width * (1 - SCALE_DOWN);
+            var heightPadding = graphic.rectTransform.rect.height * (1 - SCALE_DOWN);
 
-            var padding = _graphic.raycastPadding;
+            var padding = graphic.raycastPadding;
             padding.x -= widthPadding;
             padding.z -= widthPadding;
             padding.y -= heightPadding;
             padding.w -= heightPadding;
 
-            _graphic.raycastPadding = padding;
+            graphic.raycastPadding = padding;
         }
 
         public void UpdateOriginalScale()
@@ -62,7 +61,7 @@ namespace Floof
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (!_selectable.interactable) { return; }
+            if (!_button.interactable) { return; }
 
             _pressed = true;
             EnablePadding(true);
@@ -74,7 +73,7 @@ namespace Floof
         }
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!_selectable.interactable) { return; }
+            if (!_button.interactable) { return; }
 
             _pressed = false;
             Scale(true);

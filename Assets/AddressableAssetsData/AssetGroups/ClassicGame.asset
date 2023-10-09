@@ -29,11 +29,6 @@ MonoBehaviour:
     m_Address: FloofPresenter
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 13b98c08667dbcc48941f3fbc257a84b
-    m_Address: ClassicGameAsset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ScriptableObject
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 54391f2a50e1dc043b87717b63195d43, type: 2}
   m_SchemaSet:

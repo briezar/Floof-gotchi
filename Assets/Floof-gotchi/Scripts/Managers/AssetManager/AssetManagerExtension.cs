@@ -60,7 +60,7 @@ namespace Floof
             }
             else
             {
-                key = (string)address.Keys[0];
+                key = address.Key;
             }
             return assetsLoader.LoadAssetAsync(new AssetReferenceT<TAsset>(key));
         }

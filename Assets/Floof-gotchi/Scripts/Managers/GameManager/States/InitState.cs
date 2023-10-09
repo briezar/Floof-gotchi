@@ -10,20 +10,20 @@ namespace Floof.GameFlowStates
     {
         public InitState(StateMachine stateMachine) : base(stateMachine) { }
 
-        private PlayState _playState;
+        private ClassicGameState _classicGameState;
 
         private LoadingView _loadingView;
         private bool _finishedLoading;
 
-        public void AddStatesToTransit(PlayState playState)
+        public void AddStatesToTransit(ClassicGameState classicGameState)
         {
-            _playState = playState;
+            _classicGameState = classicGameState;
         }
 
         protected override async void OnEnter()
         {
             _loadingView = await ViewManager.ShowAsync<LoadingView>();
-            _playState.Preload().Forget();
+            var preloadTask = _classicGameState.Preload();
 
             var fadeSetting = FadeSetting.FadeOut(0.5f);
             ViewManager.FadeTransition(fadeSetting);
@@ -44,6 +44,8 @@ namespace Floof.GameFlowStates
                 await UniTask.NextFrame();
             }
 
+            await preloadTask;
+
             while (_loadingView.Fill < 1)
             {
                 _loadingView.Fill += Time.deltaTime;
@@ -52,7 +54,10 @@ namespace Floof.GameFlowStates
 
             _loadingView.SetText("Complete!");
 
-            ChangeState(_playState);
+            fadeSetting = new FadeSetting(0.5f, 0.5f);
+            fadeSetting.OnFadeInComplete = () => ChangeState(_classicGameState);
+
+            ViewManager.FadeTransition(fadeSetting);
         }
 
     }

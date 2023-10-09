@@ -8,18 +8,29 @@ namespace Floof
 {
     public struct Address
     {
-        public IReadOnlyList<object> Keys => _keyList;
+        public Addressables.MergeMode MergeMode;
         private List<object> _keyList;
+
+        public string Key => (string)Keys[0];
+        public IReadOnlyList<object> Keys => _keyList;
 
         public Address(params string[] paths)
         {
             _keyList = new List<object>();
+            MergeMode = Addressables.MergeMode.Intersection;
             AddPath(paths);
         }
         public Address(params IKeyEvaluator[] keys)
         {
             _keyList = new List<object>();
+            MergeMode = Addressables.MergeMode.Intersection;
             AddKey(keys);
+        }
+
+        public Address SetMergeMode(Addressables.MergeMode mergeMode)
+        {
+            MergeMode = mergeMode;
+            return this;
         }
 
         public Address AddPath(params string[] paths)

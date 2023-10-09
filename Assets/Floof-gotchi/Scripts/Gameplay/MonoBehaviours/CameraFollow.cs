@@ -8,8 +8,8 @@ namespace Floof
 {
     public class CameraFollow : MonoBehaviour
     {
-        [field: SerializeField] public bool FollowHorizontal { get; private set; }
-        [field: SerializeField] public bool FollowVertical { get; private set; }
+        public bool FollowHorizontal;
+        public bool FollowVertical;
 
         private Transform _target;
 
@@ -33,11 +33,11 @@ namespace Floof
             _boundCorners = bound.GetWorldCorners();
         }
 
-        public void SetBounds(Vector3 minPos, Vector3 maxPos)
+        public void SetBounds(Bounds bounds)
         {
             _boundCorners = new Vector3[4];
-            _boundCorners[0] = minPos;
-            _boundCorners[2] = maxPos;
+            _boundCorners[0] = bounds.min;
+            _boundCorners[2] = bounds.max;
         }
 
         private void Update()

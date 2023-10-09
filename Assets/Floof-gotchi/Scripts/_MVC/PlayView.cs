@@ -7,11 +7,8 @@ namespace Floof
 {
     public class PlayView : BaseView
     {
-        [SerializeField] private Scene[] _scenePrefabs;
         [SerializeField] private Transform _bottomBar;
-        [SerializeField] private CameraFollow _camFollow;
 
-        public Scene CurrentScene { get; private set; }
         private Dictionary<NeedsType, NeedsInfo> _needs;
 
         public override void OnInstantiate()
@@ -25,11 +22,6 @@ namespace Floof
             }
         }
 
-        public void SetCameraTarget(Transform floofTransform)
-        {
-            _camFollow.SetTarget(floofTransform);
-        }
-
         public NeedsInfo GetNeeds(NeedsType needsType)
         {
             if (!_needs.TryGetValue(needsType, out var needsInfo))
@@ -39,15 +31,6 @@ namespace Floof
             return needsInfo;
         }
 
-        public void GoToScene(GameSceneType gameScene)
-        {
-            var index = (int)gameScene;
-            CurrentScene.DestroyGameObject();
-            CurrentScene = Instantiate(_scenePrefabs[index], ViewManager.Instance.WorldCanvas);
-
-            var bounds = CurrentScene.GetBounds();
-            _camFollow.SetBounds(bounds.min, bounds.max);
-        }
 
         public override void OnBack()
         {

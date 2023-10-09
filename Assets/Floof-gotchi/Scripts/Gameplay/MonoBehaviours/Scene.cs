@@ -9,16 +9,22 @@ namespace Floof
 {
     public class Scene : MonoBehaviour
     {
-        [field: SerializeField] public RectTransform MoveSpace { get; private set; }
+        [field: SerializeField] public GameSceneType SceneType { get; private set; }
         [SerializeField] private SpriteRenderer _bgSpriteRenderer;
+        [SerializeField] private RectTransform _moveSpace;
 
-        private SpriteStretchFillScreen _spriteStretchFillScreen;
-
-        public Bounds GetBounds()
+        public void Init()
         {
-            _spriteStretchFillScreen ??= _bgSpriteRenderer.GetComponent<SpriteStretchFillScreen>();
-            _spriteStretchFillScreen.Stretch();
+            _bgSpriteRenderer.GetComponent<SpriteStretchFillScreen>().Stretch();
+        }
+
+        public Bounds GetCameraBounds()
+        {
             return _bgSpriteRenderer.bounds;
+        }
+        public RectTransform GetMoveSpace()
+        {
+            return _moveSpace;
         }
     }
 }

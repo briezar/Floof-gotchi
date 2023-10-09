@@ -19,7 +19,7 @@ namespace Floof.Audio
         [Button]
         private void AutoSet()
         {
-            var audioGUIDs = AssetDatabase.FindAssets($"t:{nameof(AudioClip)}", new[] { "Assets/BLOCK_C3/Audio" });
+            var audioGUIDs = AssetDatabase.FindAssets($"t:{nameof(AudioClip)}", new[] { "Assets/Floof-gotchi/Audio" });
 
             var musicCollection = new MusicCollection();
             var soundCollection = new SoundCollection();

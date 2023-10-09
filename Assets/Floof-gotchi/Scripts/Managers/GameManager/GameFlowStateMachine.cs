@@ -9,7 +9,7 @@ namespace Floof
     public class GameFlowStateMachine : StateMachine
     {
         private InitState _initState;
-        private PlayState _playState;
+        private ClassicGameState _classicGameState;
 
         private MonoBehaviour _coroutineRunner;
         private Coroutine _updateRoutine;
@@ -19,9 +19,9 @@ namespace Floof
             _coroutineRunner = coroutineRunner;
 
             _initState = new InitState(this);
-            _playState = new PlayState(this);
+            _classicGameState = new ClassicGameState(this);
 
-            _initState.AddStatesToTransit(_playState);
+            _initState.AddStatesToTransit(_classicGameState);
 
             OnStateChange += CheckUpdate;
 

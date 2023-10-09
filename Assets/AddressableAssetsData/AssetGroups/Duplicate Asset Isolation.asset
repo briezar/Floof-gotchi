@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Duplicate Asset Isolation
+  m_EditorClassIdentifier: 
+  m_GroupName: Duplicate Asset Isolation
+  m_Data:
+    m_SerializedData: []
+  m_GUID: de070b5264dc1d943891e40dcdd002fa
+  m_SerializeEntries:
+  - m_GUID: 865e109d9e36e58418232f8ee54f3f11
+    m_Address: Assets/Floof-gotchi/Textures/Floof.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: bbcd585f23a28ba4db52e6d946392773
+    m_Address: Assets/Floof-gotchi/Animations/FloofSprite/FloofSprite.controller
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 97c4e440a507a534dab40e33005cc2b7
+    m_Address: Assets/Floof-gotchi/Animations/FloofSprite/floof-eat.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6178e6a139239ec4d8e4c42b33d57cbb
+    m_Address: Assets/Floof-gotchi/Animations/FloofSprite/floof-idle-0.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 837de2e67ff97414ebb79970a8f07582
+    m_Address: Assets/Floof-gotchi/Animations/FloofSprite/floof-walk.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 54391f2a50e1dc043b87717b63195d43, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 2951ae0cf4e47354db81d5d3dc4afc1a, type: 2}
+    - {fileID: 11400000, guid: 93f862e8cf95fab4caf0fc29cfbb4b2c, type: 2}

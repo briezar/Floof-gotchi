@@ -17,7 +17,7 @@ namespace Floof
         private Coroutine _wanderRoutine;
         private Tween _moveTween;
 
-        public void Setup(RectTransform moveSpace)
+        public void SetMoveSpace(RectTransform moveSpace)
         {
             transform.position = moveSpace.position;
             _moveSpaceCorners = moveSpace.GetWorldCorners();
@@ -58,18 +58,16 @@ namespace Floof
         public void StopMoving()
         {
             if (_wanderRoutine != null) { StopCoroutine(_wanderRoutine); }
-            _moveTween.Complete();
+            _moveTween.Kill();
         }
 
         private Vector2 GetRandomPos()
         {
-            var xMin = _moveSpaceCorners[0].x;
-            var yMin = _moveSpaceCorners[0].y;
-            var xMax = _moveSpaceCorners[2].x;
-            var yMax = _moveSpaceCorners[2].y;
+            var minPos = _moveSpaceCorners[0];
+            var maxPos = _moveSpaceCorners[2];
 
-            var x = Random.Range(xMin, xMax);
-            var y = Random.Range(yMin, yMax);
+            var x = Random.Range(minPos.x, maxPos.x);
+            var y = Random.Range(minPos.y, maxPos.y);
             var pos = new Vector2(x, y);
 
             return pos;

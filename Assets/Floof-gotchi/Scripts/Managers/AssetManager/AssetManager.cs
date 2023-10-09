@@ -18,7 +18,7 @@ namespace Floof
 
         public static IList<IResourceLocation> GetLocations(Address address, Type type = null)
         {
-            var locationHandle = Addressables.LoadResourceLocationsAsync(address.Keys, Addressables.MergeMode.Intersection, type);
+            var locationHandle = Addressables.LoadResourceLocationsAsync(address.Keys, address.MergeMode, type);
             var locations = locationHandle.WaitForCompletion();
             Addressables.Release(locationHandle);
 

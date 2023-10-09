@@ -40,7 +40,6 @@ namespace Floof
         {
             if (Instance != null)
             {
-                Destroy(gameObject);
                 return;
             }
             Instance = this;
@@ -60,7 +59,6 @@ namespace Floof
                 view.OnInstantiate();
             }
 
-
             _nameToAddressMap = new();
             var locations = AssetManager.GetLocations(new Address(_viewLabel));
             foreach (var location in locations)
@@ -69,7 +67,7 @@ namespace Floof
                 var startIndex = key.LastIndexOf('/') + 1;
                 var viewName = key.Substring(startIndex).Replace(".prefab", "");
                 var assetRef = new PrefabReference(key);
-                _nameToAddressMap.Add(viewName, assetRef);
+                _nameToAddressMap.TryAdd(viewName, assetRef);
             }
         }
         private void OnDestroy()
